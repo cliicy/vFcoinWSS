@@ -9,7 +9,7 @@ import numpy as np
 import logging
 from collections import defaultdict
 from threading import Thread
-
+from multiprocessing import Process
 from fcoin import Fcoin
 from WSS.fcoin_client import fcoin_client
 from balance import Balance
@@ -17,6 +17,8 @@ import config
 import os
 import csv
 import json
+from multiprocessing import Pool
+import subprocess
 
 # sDir = os.path.join(os.path.abspath('..'), '..', 'Fcoin_DL')
 sDir = os.path.join(os.path.abspath('..'), 'data')
@@ -24,6 +26,11 @@ tradertdir = 'trader'
 exchange = 'Fcoin'
 
 
+def do_trades(sym):
+    cmd = '{0}{1}'.format('python trade.py ', sym)
+    pipe = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout
+    print(pipe.read())
+    print('hh')
 
 class MarketApp:
     """
@@ -40,32 +47,29 @@ class MarketApp:
         # self.client.stream.stream_depth.subscribe(self.depth)
         # self.client.stream.stream_klines.subscribe(self.candle)
         # self.client.stream.stream_ticker.subscribe(self.ticker)
-        self.client.stream.stream_marketTrades.subscribe(self.trade)
+        # self.client.stream.stream_marketTrades.subscribe(self.trade)
         self.fcoin = Fcoin()
         self.fcoin.auth(config.key, config.secret)
-
-
-        self.sym = ''
         # self.buy_price = None  # 买1价
         # self.buy_amount = None  # 买1量
         # self.sell_price = None  # 卖1价
         # self.sell_amount = None  # 卖1量
         self.ts = None  # 深度更新时间
         #
-        # self.market_price = None  # 市价
-        # self.market_trade_list = None
-        # self.total_bids = 0
-        # self.total_asks = 0
+        self.market_price = None  # 市价
+        self.market_trade_list = None
+        self.total_bids = 0
+        self.total_asks = 0
         #
-        # self.filled_buy_order_list = []
+        self.filled_buy_order_list = []
         self.order_list = defaultdict(lambda: None)
-        # self.buy_order_id = None
+        self.buy_order_id = None
         self.dic_balance = defaultdict(lambda: None)
         self.time_order = time.time()
         #
-        # self.price_list = []
-        # self.candle_list = []
-        # self.SMA = None
+        self.price_list = []
+        self.candle_list = []
+        self.SMA = None
         self._init_log()
 
     # 日志初始化
@@ -155,6 +159,8 @@ class MarketApp:
 
     # write trade iformation
     def sync_tradesinfo(self, data):
+        name, sym = self.client.channel_config[0].split('.')
+        # print('symbol: ', sym)
         # create the no-exist folder to save date
         stime = time.strftime('%Y%m%d', time.localtime())
         stradeDir = os.path.join(sDir, stime, exchange, tradertdir)
@@ -162,10 +168,10 @@ class MarketApp:
             os.makedirs(stradeDir)
 
         # for original data
-        sTfile = '{0}_{1}_{2}{3}'.format(tradertdir, stime, self.sym, '.txt')
+        sTfile = '{0}_{1}_{2}{3}'.format(tradertdir, stime, sym, '.txt')
         sTfilepath = os.path.join(stradeDir, sTfile)
 
-        sfile = '{0}_{1}_{2}{3}'.format(tradertdir, stime, self.sym, '.csv')
+        sfile = '{0}_{1}_{2}{3}'.format(tradertdir, stime, sym, '.csv')
         sfilepath = os.path.join(stradeDir, sfile)
         sflag = 'price'
         rFind = False
@@ -351,20 +357,29 @@ class MarketApp:
         # self.client.subscribe_ticker(config.symbol['name'])
         # tradesinfo = self.client.subscribe_trade(config.symbol['name'])
         # self.sym = config.symbol['name']
-        for sy in config.sylist:
-            # tradesinfo = self.client.subscribe_trade(sy)
-            # print(tradesinfo)
-            self.client.subscribe_trade(sy)
-            self.sym = sy
 
-        while True:
-            try:
-                pass
-                # self.process()
-            except Exception as error:
-                print(error)
-                # self._log.info('未知错误')
-            time.sleep(1)
+        # create 4 processes to get data parallelly
+        for sy in config.sylist:
+            # self.do_trades(sy)
+            p = Process(target=do_trades, args=(sy,))
+            print('Child process will start.')
+            p.start()
+
+        # while True:
+        #     try:
+        #         pass
+        #         # self.process()
+        #     except Exception as error:
+        #         print(error)
+        #         # self._log.info('未知错误')
+        #     time.sleep(1)
+
+    def do_trades(self, sym):
+        cmd = '{0}{1}'.format('python trade.py ', sym)
+        pipe = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout
+        print(pipe.read())
+        print('hh')
+
 
     # 获取余额
     @property

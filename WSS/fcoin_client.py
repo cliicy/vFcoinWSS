@@ -125,16 +125,19 @@ class fcoin_client(object):
         except KeyError:
             pass
 
+
 def t(data):
     print(data)
 
-if __name__ == '__main__':
-    c = fcoin_client()
-    c.stream.stream_depth.subscribe(t)
-    c.start()
-    import time
-    time.sleep(5)
-    c.subscribe_depth('btcusdt','L20')
 
-    while 1:
-        pass
+if __name__ == '__main__':
+    pass
+    # c = fcoin_client()
+    # c.stream.stream_depth.subscribe(t)
+    # c.start()
+    # import time
+    # time.sleep(5)
+    # c.subscribe_depth('btcusdt','L20')
+    #
+    # while 1:
+    #     pass

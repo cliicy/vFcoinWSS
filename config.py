@@ -46,7 +46,7 @@ delay = 20
 
 trade_head = ['amount', 'ts', 'id', 'side', 'price']
 # sylist = ['btcusdt', 'ethusdt', 'bchusdt', 'ltcusdt', 'ftusdt', 'fteth', 'etcusdt', 'ftbtc', 'bnbusdt', 'btmusdt']
-# sylist = ['btcusdt', 'bchusdt', 'ethusdt', 'ltcusdt']
-sylist = ['btcusdt']
+sylist = ['btcusdt', 'bchusdt', 'ethusdt', 'ltcusdt']
+# sylist = ['btcusdt']
 
 
