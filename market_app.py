@@ -30,7 +30,14 @@ def do_trades(sym):
     cmd = '{0}{1}'.format('python trade.py ', sym)
     pipe = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout
     print(pipe.read())
-    print('hh')
+    print('finished to getting trades information')
+
+
+def do_depth(sym):
+    cmd = '{0}{1}'.format('python depth.py ', sym)
+    pipe = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout
+    print(pipe.read())
+    print('finished to getting depth information')
 
 class MarketApp:
     """
@@ -353,33 +360,23 @@ class MarketApp:
             time.sleep(1)
 
         # self.client.subscribe_depth(config.symbol['name'], 'L20')
+        # create 4 processes to get depth data parallelly
+        for sy in config.sylist:
+            p = Process(target=do_depth, args=(sy,))
+            print('syncing depth information will start.')
+            p.start()
+
         # self.client.subscribe_candle(config.symbol['name'], 'M1')
         # self.client.subscribe_ticker(config.symbol['name'])
         # tradesinfo = self.client.subscribe_trade(config.symbol['name'])
         # self.sym = config.symbol['name']
 
-        # create 4 processes to get data parallelly
+        # create 4 processes to get trades data parallelly
         for sy in config.sylist:
             # self.do_trades(sy)
             p = Process(target=do_trades, args=(sy,))
-            print('Child process will start.')
+            print('syncing trades information will start.')
             p.start()
-
-        # while True:
-        #     try:
-        #         pass
-        #         # self.process()
-        #     except Exception as error:
-        #         print(error)
-        #         # self._log.info('未知错误')
-        #     time.sleep(1)
-
-    def do_trades(self, sym):
-        cmd = '{0}{1}'.format('python trade.py ', sym)
-        pipe = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).stdout
-        print(pipe.read())
-        print('hh')
-
 
     # 获取余额
     @property
