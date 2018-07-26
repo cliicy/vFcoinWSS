@@ -51,7 +51,8 @@ class MarketApp:
         sfilepath = os.path.join(stradeDir, sfile)
         sflag = 'price'
         rFind = False
-
+        kklist = []
+        vvlist = []
         if os.path.exists(sfilepath):
             with open(sfilepath, 'r', encoding='utf-8') as f:
                 first_line = f.readline()  # 取第一行
@@ -60,12 +61,26 @@ class MarketApp:
             w = csv.writer(f)
             if rFind is True:
                 vlist = list(data.values())
+                vlist.insert(0, sym)
                 w.writerow(vlist)
             else:
                 klist = list(data.keys())
-                w.writerow(klist)
+                kklist.insert(0, 'symbol')
+                kklist.insert(1, klist[2])
+                kklist.insert(2, klist[1])
+                kklist.insert(3, 'direction')
+                kklist.insert(4, klist[0])
+                kklist.insert(5, klist[4])
+                w.writerow(kklist)
                 vlist = list(data.values())
-                w.writerow(vlist)
+                vvlist = []
+                vvlist.insert(0, sym)
+                vvlist.insert(1, vlist[2])
+                vvlist.insert(2, vlist[1])
+                vvlist.insert(3, vlist[3])
+                vvlist.insert(4, vlist[0])
+                vvlist.insert(5, vlist[4])
+                w.writerow(vvlist)
         f.close()
 
         # write original data to txt files
