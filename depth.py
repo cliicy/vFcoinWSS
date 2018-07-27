@@ -95,7 +95,7 @@ class MarketApp:
             self._log.info('waitting……')
             time.sleep(1)
 
-        self.sync_depth(run.sym)
+        self.sync_depth(self.sym)
         while True:
             try:
                 pass

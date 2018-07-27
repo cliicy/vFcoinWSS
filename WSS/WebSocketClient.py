@@ -3,9 +3,10 @@ import logging
 import time
 import datetime
 from threading import Thread, Event
+import json
+
 
 class Connection(Thread):
-
     def __init__(
             self,
             *arge,
@@ -24,17 +25,13 @@ class Connection(Thread):
         self._onMessage = onMessage
         self._onError = onError
         self._reconnect_interval = reconnect_interval if reconnect_interval else 10
-
         self._socket = None
         self.isConnected = Event()
         self._disconnecte_required = Event()
         self._reconnect_required = Event()
         self._lastReceiveTime = datetime.datetime.now()
-
         self._log = None
         self._init_log(log_level)
-
-
         Thread.__init__(self)
         self.daemon = True
 
@@ -47,8 +44,6 @@ class Connection(Thread):
         handler.setLevel(log_level)
         handler.setFormatter(formatter)
         self._log.addHandler(handler)
-
-
         console = logging.StreamHandler()
         console.setLevel(logging.DEBUG)
         console.setFormatter(formatter)
@@ -97,6 +92,8 @@ class Connection(Thread):
         self._reconnect_required.set()
         if self._socket:
             self._socket.close()
+
+
 
     def _on_open(self, ws):
         self._log.debug('连接成功')

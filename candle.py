@@ -13,12 +13,13 @@ import os
 import csv
 import json
 import sys
-import subprocess
 
 # sDir = os.path.join(os.path.abspath('..'), '..', 'Fcoin_DL')
 sDir = os.path.join(os.path.abspath('..'), 'data')
-tradertdir = 'trader'
+klinedir = 'kline'
 exchange = 'Fcoin'
+mflag = 'M1'
+khead = ['symbol', 'ts', 'tm_intv', 'id', 'open', 'close', 'low', 'high', 'amount', 'vol', 'count']
 
 
 class MarketApp:
@@ -32,23 +33,24 @@ class MarketApp:
         self.sym = ''
         self._init_log()
 
-    # write trade iformation
-    def sync_tradesinfo(self, data):
-        name, sym = self.client.channel_config[0].split('.')
+    def candle(self, data):
+        # print('数据：',data)
+        name, ml, sym = self.client.channel_config[0].split('.')
+        ts = self.client.get_ts()
         # print('symbol: ', sym)
         # create the no-exist folder to save date
         stime = time.strftime('%Y%m%d', time.localtime())
-        stradeDir = os.path.join(sDir, stime, exchange, tradertdir)
+        stradeDir = os.path.join(sDir, stime, exchange, klinedir)
         if not os.path.exists(stradeDir):
             os.makedirs(stradeDir)
 
         # for original data
-        sTfile = '{0}_{1}_{2}{3}'.format(tradertdir, stime, sym, '.txt')
+        sTfile = '{0}_{1}_{2}{3}'.format(klinedir, stime, sym, '.txt')
         sTfilepath = os.path.join(stradeDir, sTfile)
 
-        sfile = '{0}_{1}_{2}{3}'.format(tradertdir, stime, sym, '.csv')
+        sfile = '{0}_{1}_{2}{3}'.format(klinedir, stime, sym, '.csv')
         sfilepath = os.path.join(stradeDir, sfile)
-        sflag = 'price'
+        sflag = 'close'
         rFind = False
         kklist = []
         vvlist = []
@@ -60,24 +62,25 @@ class MarketApp:
             w = csv.writer(f)
             if rFind is True:
                 vlist = list(data.values())
-                vlist.insert(0, sym)
-                w.writerow(vlist)
-            else:
+                self.additem2list(ts, vvlist, sym, ml, vlist)
+                w.writerow(vvlist)
+            else:  # khead = ['symbol', 'ts', 'tm_intv', 'id', 'open', 'close', 'low', 'high', 'amount', 'vol', 'count']
                 klist = list(data.keys())
+                # open,close,high,quote_vol,id,count,low,seq,base_vol
                 kklist.insert(0, 'symbol')
-                kklist.insert(1, klist[2])
-                kklist.insert(2, klist[1])
-                kklist.insert(3, 'direction')
+                kklist.insert(1, 'ts')
+                kklist.insert(2, 'tm_intv')
+                kklist.insert(3, klist[4])
                 kklist.insert(4, klist[0])
-                kklist.insert(5, klist[4])
+                kklist.insert(5, klist[1])
+                kklist.insert(6, klist[6])
+                kklist.insert(7, klist[2])
+                kklist.insert(8, 'amount')
+                kklist.insert(9, 'vol')
+                kklist.insert(10, klist[5])
                 w.writerow(kklist)
                 vlist = list(data.values())
-                vvlist.insert(0, sym)
-                vvlist.insert(1, vlist[2])
-                vvlist.insert(2, vlist[1])
-                vvlist.insert(3, vlist[3])
-                vvlist.insert(4, vlist[0])
-                vvlist.insert(5, vlist[4])
+                self.additem2list(ts, vvlist, sym, ml, vlist)
                 w.writerow(vvlist)
         f.close()
 
@@ -86,9 +89,19 @@ class MarketApp:
             tf.writelines(json.dumps(data) + '\n')
             tf.close()
 
-    def trade(self, data):
-        # print('数据：',data)
-        self.sync_tradesinfo(data)
+    # add extral items to the original list
+    def additem2list(self, ts, vvlist, sym, ml, vlist):
+        vvlist.insert(0, sym)
+        vvlist.insert(1, ts)
+        vvlist.insert(2, ml)
+        vvlist.insert(3, vlist[4])
+        vvlist.insert(4, vlist[0])
+        vvlist.insert(5, vlist[1])
+        vvlist.insert(6, vlist[6])
+        vvlist.insert(7, vlist[2])
+        vvlist.insert(8, vlist[3])
+        vvlist.insert(9, vlist[8])
+        vvlist.insert(10, vlist[5])
 
     # 循环
     def loop(self):
@@ -98,7 +111,7 @@ class MarketApp:
             self._log.info('waitting……')
             time.sleep(1)
 
-        self.sync_trades(self.sym)
+        self.sync_kline(self.sym)
         while True:
             try:
                 pass
@@ -107,9 +120,9 @@ class MarketApp:
             time.sleep(1)
 
     # sync_trades
-    def sync_trades(self, sym):
-        self.client.stream.stream_marketTrades.subscribe(self.trade)
-        self.client.subscribe_trade(sym)
+    def sync_kline(self, sym):
+        self.client.stream.stream_klines.subscribe(self.candle)
+        self.client.subscribe_candle(sym, mflag)
 
     # 日志初始化
     def _init_log(self):
@@ -140,4 +153,4 @@ if __name__ == '__main__':
     thread = Thread(target=run.loop)
     thread.start()
     thread.join()
-    print('done to get trade information data')
+    print('kline finished')
