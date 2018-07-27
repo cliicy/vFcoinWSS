@@ -9,17 +9,18 @@ from WSS.WebSocketClient import Connection
 from WSS.stream import stream
 log = logging.getLogger(__name__)
 
+
 def is_connected(func):
     def wrapped(self, *args, **kwargs):
         if self._client and self.isConnected:
             return func(self, *args, **kwargs)
         else:
-            log.error("Cannot call %s() on unestablished connection!",func.__name__)
+            log.error("Cannot call %s() on unestablished connection!", func.__name__)
             return None
     return wrapped
 
-class fcoin_client(object):
 
+class fcoin_client(object):
     def __init__(self, log_level= logging.DEBUG):
         self._client = Connection(
             url='wss://api.fcoin.com/v2/ws',
@@ -30,6 +31,7 @@ class fcoin_client(object):
             log_level=log_level,
             reconnect_interval=10
         )
+        self._ts = ''
         self.stream = stream()
         self.channel_config = []
         self.channel_directory = {}
@@ -46,6 +48,9 @@ class fcoin_client(object):
     def start(self):
         self._client.start()
 
+    def get_ts(self):
+        return self._ts
+
     def _onOpen(self):
         if len(self.channel_config) > 0:
             for item in self.channel_config:
@@ -58,15 +63,16 @@ class fcoin_client(object):
             # Something wrong with this data, log and discard
             return
         if isinstance(data, dict):
+            if 'ts' in data:
+                self._ts = data['ts']
             if 'topics' in data:
                 self._response_handler(data['topics'])
             elif 'type' in data:
-                type = data.pop('type')
-                self._data_handler(type, data)
-
-
+                ttype = data.pop('type')
+                self._data_handler(ttype, data)
         else:
             pass
+
     def _onClose(self):
         pass
 
@@ -79,9 +85,8 @@ class fcoin_client(object):
         self._client.send(data)
 
     @is_connected
-    def _subscribe(self,channel):
-        #{"cmd":"sub","args":["ticker.btcusdt"],"id":"1"}
-
+    def _subscribe(self, channel):
+        # {"cmd":"sub","args":["ticker.btcusdt"],"id":"1"}
         if channel not in self.channel_config:
             self.channel_config.append(channel)
 
