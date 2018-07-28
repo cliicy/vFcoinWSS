@@ -1,8 +1,7 @@
 # !-*-coding:utf-8 -*-
-# @TIME    : 2018/6/11/0011 15:32
-# @Author  : Nogo
+# @TIME    : 2018/7/21/0011 15:32
+# @Author  : Luo
 
-import math
 import time
 import logging
 from collections import defaultdict
@@ -11,13 +10,7 @@ from multiprocessing import Process
 from fcoin import Fcoin
 from WSS.fcoin_client import fcoin_client
 import config
-import os
 import subprocess
-
-# sDir = os.path.join(os.path.abspath('..'), '..', 'Fcoin_DL')
-sDir = os.path.join(os.path.abspath('..'), 'data')
-tradertdir = 'trader'
-exchange = 'Fcoin'
 
 
 def do_trades(sym):
@@ -90,12 +83,6 @@ class MarketApp:
         console.setLevel(logging.INFO)
         console.setFormatter(formatter)
         self._log.addHandler(console)
-
-    # 市价
-    def ticker(self, data):
-        print("ticker data: ", data)
-        self.ts = time.time()
-        # self.market_price = data['ticker'][0]
 
     # 循环
     def loop(self):

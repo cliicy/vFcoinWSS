@@ -13,7 +13,6 @@ import os
 import csv
 import json
 import sys
-import subprocess
 
 # sDir = os.path.join(os.path.abspath('..'), '..', 'Fcoin_DL')
 sDir = os.path.join(os.path.abspath('..'), 'data')

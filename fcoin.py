@@ -1,7 +1,6 @@
-
 #!-*-coding:utf-8 -*-
-#@TIME    : 2018/6/10/0010 11:19
-#@Author  : Nogo
+# @TIME    : 2018/6/10/0010 11:19
+# @Author  :
 
 
 import hmac
@@ -13,15 +12,15 @@ import base64
 import json
 from collections import OrderedDict
 
+
 class Fcoin():
 
-    def __init__(self,base_url = 'https://api.fcoin.com/v2/'):
+    def __init__(self, base_url='https://api.fcoin.com/v2/'):
         self.base_url = base_url
 
     def auth(self, key, secret):
-        self.key = bytes(key,'utf-8')
+        self.key = bytes(key, 'utf-8')
         self.secret = bytes(secret, 'utf-8')
-
 
     def public_request(self, method, api_url, **payload):
         """request public url"""
@@ -104,7 +103,7 @@ class Fcoin():
         """get market depth"""
         return self.public_request('GET', 'market/depth/{level}/{symbol}'.format(level=level, symbol=symbol))
 
-    def get_trades(self,symbol):
+    def get_trades(self, symbol):
         """get detail trade"""
         return self.public_request('GET', 'market/trades/{symbol}'.format(symbol=symbol))
 
@@ -118,9 +117,9 @@ class Fcoin():
 
     def create_order(self, **payload):
         """create order"""
-        return self.signed_request('POST','orders', **payload)
+        return self.signed_request('POST', 'orders', **payload)
 
-    def buy(self,symbol, price, amount):
+    def buy(self, symbol, price, amount):
         """buy someting"""
         return self.create_order(symbol=symbol, side='buy', type='limit', price=str(price), amount=amount)
 

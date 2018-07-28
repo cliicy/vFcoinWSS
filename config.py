@@ -4,8 +4,8 @@
 # @Author  : Luo
 
 # 秘钥
-key = '0000'
-secret = '0000'
+key = '55b6353945d14944bece3b5bc8d42580'
+secret = 'e5f615e4d88d47a082a1b0f263fb8309'
 
 
 # 精度和最小挂单量

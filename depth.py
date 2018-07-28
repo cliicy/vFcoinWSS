@@ -13,7 +13,6 @@ import os
 import csv
 import json
 import sys
-import subprocess
 
 # sDir = os.path.join(os.path.abspath('..'), '..', 'Fcoin_DL')
 sDir = os.path.join(os.path.abspath('..'), 'data')
@@ -71,7 +70,7 @@ class MarketApp:
                 w = csv.writer(f)
                 blst = bidlists[idp:idp + 2]
                 alst = asklists[idp:idp + 2]
-                balist = [sym, data['ts'], level, alst[0], blst[0], alst[1], blst[1]]
+                balist = [sym, data['ts'], idp, alst[0], blst[0], alst[1], blst[1]]
                 # balist.extend(bidlists[idp:idp + 2])
                 # balist.extend(asklists[idp:idp + 2])
                 if rFind is True:

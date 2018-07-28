@@ -28,7 +28,7 @@ config.py 配置文件，密匙在这里设置
 接口api
 https://developer.fcoin.com
 
-
-FCOIN停止更新
+内部git server:
+http://10.0.131.49:10101/summary/quaninvest.git
 
 
