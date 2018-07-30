@@ -1,7 +1,6 @@
-
 #!-*-coding:utf-8 -*-
-#@TIME    : 2018/6/11/0011 15:36
-#@Author  : Nogo
+# @TIME    : 2018/6/11/0011 15:36
+# @Author  : Nogo
 
 import logging
 import json
@@ -20,7 +19,7 @@ def is_connected(func):
     return wrapped
 
 
-class fcoin_client(object):
+class FcoinClient(object):
     def __init__(self, log_level= logging.DEBUG):
         self._client = Connection(
             url='wss://api.fcoin.com/v2/ws',
@@ -137,7 +136,7 @@ def t(data):
 
 if __name__ == '__main__':
     pass
-    # c = fcoin_client()
+    # c = FcoinClient()
     # c.stream.stream_depth.subscribe(t)
     # c.start()
     # import time
