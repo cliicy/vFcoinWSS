@@ -7,7 +7,7 @@ import logging
 from threading import Thread
 
 from fcoin import Fcoin
-from WSS.fcoin_client import fcoin_client
+from WSS.fcoin_client import FcoinClient
 import config
 import os
 import csv
@@ -24,7 +24,7 @@ class MarketApp:
     """
     """
     def __init__(self):
-        self.client = fcoin_client()
+        self.client = FcoinClient()
         self.fcoin = Fcoin()
         self.fcoin.auth(config.key, config.secret)
         self._sym = ''
@@ -112,6 +112,7 @@ class MarketApp:
     # 最新成交价,最近一笔成交的成交量,最大买一价,最大买一量,最小卖一价,最小卖一量,24小时前成交价,24小时内最高价,
     # 24小时内最低价,24小时内基准货币成交量,24小时内计价货币成交量
     def addI2list(self, ts, vvlist, sym, vlist):
+        self._sym = sym  # acutally it will not be used
         vvlist.insert(0, sym)
         vvlist.insert(1, ts)
         vvlist.insert(2, vlist[0])

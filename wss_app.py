@@ -13,14 +13,14 @@ from threading import Thread
 
 
 from fcoin import Fcoin
-from WSS.fcoin_client import fcoin_client
-from balance import balance
+from WSS.fcoin_client import FcoinClient
+from balance import Balance
 import config
 
 class wss_app():
 
     def __init__(self):
-        self.client = fcoin_client()
+        self.client = FcoinClient()
         self.client.stream.stream_depth.subscribe(self.depth)
         self.client.stream.stream_klines.subscribe(self.candle)
         self.client.stream.stream_ticker.subscribe(self.ticker)
@@ -303,13 +303,13 @@ class wss_app():
                 self._log.info('未知错误')
             time.sleep(0.5)
 
-    #获取余额
+    # 获取余额
     def get_balance(self):
         dic_balance = defaultdict(lambda: None)
         success, data = self.fcoin.get_balance()
         if success:
             for item in data['data']:
-                dic_balance[item['currency']] = balance(float(item['available']), float(item['frozen']),float(item['balance']))
+                dic_balance[item['currency']] = Balance(float(item['available']), float(item['frozen']),float(item['balance']))
         return dic_balance
 
     #获取订单

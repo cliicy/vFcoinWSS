@@ -8,7 +8,7 @@ from collections import defaultdict
 from threading import Thread
 from multiprocessing import Process
 from fcoin import Fcoin
-from WSS.fcoin_client import fcoin_client
+from WSS.fcoin_client import FcoinClient
 import config
 import subprocess
 
@@ -43,7 +43,7 @@ def do_ticker(sym):
 
 class MarketApp:
     def __init__(self):
-        self.client = fcoin_client()
+        self.client = FcoinClient()
         self.fcoin = Fcoin()
         self.fcoin.auth(config.key, config.secret)
         self.ts = None  # 深度更新时间

@@ -7,7 +7,7 @@ import logging
 from threading import Thread
 
 from fcoin import Fcoin
-from WSS.fcoin_client import fcoin_client
+from WSS.fcoin_client import FcoinClient
 import config
 import os
 import csv
@@ -26,7 +26,7 @@ class MarketApp:
     """
 
     def __init__(self):
-        self.client = fcoin_client()
+        self.client = FcoinClient()
         self.fcoin = Fcoin()
         self.fcoin.auth(config.key, config.secret)
         self.sym = ''
@@ -70,7 +70,7 @@ class MarketApp:
                 w = csv.writer(f)
                 blst = bidlists[idp:idp + 2]
                 alst = asklists[idp:idp + 2]
-                balist = [sym, data['ts'], idp, alst[0], blst[0], alst[1], blst[1]]
+                balist = [sym, data['ts'], idp/2, alst[0], blst[0], alst[1], blst[1]]
                 # balist.extend(bidlists[idp:idp + 2])
                 # balist.extend(asklists[idp:idp + 2])
                 if rFind is True:

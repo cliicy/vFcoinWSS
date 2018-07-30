@@ -13,10 +13,11 @@ import json
 from collections import OrderedDict
 
 
-class Fcoin():
-
+class Fcoin:
     def __init__(self, base_url='https://api.fcoin.com/v2/'):
         self.base_url = base_url
+        self.key = ''
+        self.secret = ''
 
     def auth(self, key, secret):
         self.key = bytes(key, 'utf-8')
@@ -49,7 +50,7 @@ class Fcoin():
         param=''
         if payload:
             sort_pay = sorted(payload.items())
-            #sort_pay.sort()
+            # sort_pay.sort()
             for k in sort_pay:
                 param += '&' + str(k[0]) + '=' + str(k[1])
             param = param.lstrip('&')

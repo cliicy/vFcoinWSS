@@ -11,7 +11,7 @@ from collections import defaultdict
 from threading import Thread
 from multiprocessing import Process
 from fcoin import Fcoin
-from WSS.fcoin_client import fcoin_client
+from WSS.fcoin_client import FcoinClient
 from balance import Balance
 import config
 import os
@@ -58,7 +58,7 @@ class MarketApp:
     """
 
     def __init__(self):
-        self.client = fcoin_client()
+        self.client = FcoinClient()
         # self.client.stream.stream_depth.subscribe(self.depth)
         # self.client.stream.stream_klines.subscribe(self.candle)
         # self.client.stream.stream_ticker.subscribe(self.ticker)

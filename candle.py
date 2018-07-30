@@ -7,7 +7,7 @@ import logging
 from threading import Thread
 
 from fcoin import Fcoin
-from WSS.fcoin_client import fcoin_client
+from WSS.fcoin_client import FcoinClient
 import config
 import os
 import csv
@@ -27,7 +27,7 @@ class MarketApp:
     """
 
     def __init__(self):
-        self.client = fcoin_client()
+        self.client = FcoinClient()
         self.fcoin = Fcoin()
         self.fcoin.auth(config.key, config.secret)
         self.sym = ''
@@ -91,6 +91,7 @@ class MarketApp:
 
     # add extral items to the original list
     def additem2list(self, ts, vvlist, sym, ml, vlist):
+        self.sym = sym  # acutally it will not be used
         vvlist.insert(0, sym)
         vvlist.insert(1, ts)
         vvlist.insert(2, ml)
