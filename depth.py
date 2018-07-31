@@ -70,7 +70,7 @@ class MarketApp:
                 w = csv.writer(f)
                 blst = bidlists[idp:idp + 2]
                 alst = asklists[idp:idp + 2]
-                balist = [sym, data['ts'], idp/2, alst[0], blst[0], alst[1], blst[1]]
+                balist = [sym, data['ts'], 1+idp/2, alst[0], blst[0], alst[1], blst[1]]
                 # balist.extend(bidlists[idp:idp + 2])
                 # balist.extend(asklists[idp:idp + 2])
                 if rFind is True:

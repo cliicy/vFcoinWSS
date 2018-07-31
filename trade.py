@@ -58,9 +58,14 @@ class MarketApp:
         with open(sfilepath, 'a+', encoding='utf-8', newline='') as f:
             w = csv.writer(f)
             if rFind is True:
-                vlist = list(data.values())
-                vlist.insert(0, sym)
-                w.writerow(vlist)
+                # vlist = list(data.values())
+                vvlist.insert(0, sym)
+                vvlist.insert(1, data["id"])
+                vvlist.insert(2, data["ts"])
+                vvlist.insert(3, data["side"])
+                vvlist.insert(4, data["amount"])
+                vvlist.insert(5, data["price"])
+                w.writerow(vvlist)
             else:
                 klist = list(data.keys())
                 kklist.insert(0, 'symbol')
