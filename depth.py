@@ -17,7 +17,7 @@ import sys
 # sDir = os.path.join(os.path.abspath('..'), '..', 'Fcoin_DL')
 sDir = os.path.join(os.path.abspath('..'), 'data')
 depthdir = 'depth'
-exchange = 'Fcoin'
+exchange = 'fcoin'
 dlevel = 'L20'
 
 

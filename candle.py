@@ -17,7 +17,7 @@ import sys
 # sDir = os.path.join(os.path.abspath('..'), '..', 'Fcoin_DL')
 sDir = os.path.join(os.path.abspath('..'), 'data')
 klinedir = 'kline'
-exchange = 'Fcoin'
+exchange = 'fcoin'
 mflag = 'M1'
 khead = ['symbol', 'ts', 'tm_intv', 'id', 'open', 'close', 'low', 'high', 'amount', 'vol', 'count']
 
