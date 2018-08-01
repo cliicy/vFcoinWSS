@@ -5,7 +5,7 @@
 import time
 import logging
 from threading import Thread
-
+import pandas as pd
 from fcoin import Fcoin
 from WSS.fcoin_client import FcoinClient
 import config
@@ -14,16 +14,13 @@ import csv
 import json
 import sys
 
-# sDir = os.path.join(os.path.abspath('..'), '..', 'Fcoin_DL')
-sDir = os.path.join(os.path.abspath('..'), 'data')
-tradertdir = 'trader'
-exchange = 'fcoin'
+sDir_ = os.path.join(os.path.abspath('..'), config.sD_)
+sDir = os.path.join(os.path.abspath('..'), config.sD)
 
 
 class MarketApp:
     """
     """
-
     def __init__(self):
         self.client = FcoinClient()
         self.fcoin = Fcoin()
@@ -37,25 +34,34 @@ class MarketApp:
         # print('symbol: ', sym)
         # create the no-exist folder to save date
         stime = time.strftime('%Y%m%d', time.localtime())
-        stradeDir = os.path.join(sDir, stime, exchange, tradertdir)
+        stDir = os.path.join(sDir_, stime, config.exchange, config.tradertdir)
+        stradeDir = os.path.join(sDir, stime, config.exchange, config.tradertdir)
+        # # for no-duplicated csv data
         if not os.path.exists(stradeDir):
             os.makedirs(stradeDir)
 
+        # for possible duplicated csv data path
+        if not os.path.exists(stDir):
+            os.makedirs(stDir)
         # for original data
-        sTfile = '{0}_{1}_{2}{3}'.format(tradertdir, stime, sym, '.txt')
+        sTfile = '{0}_{1}_{2}{3}'.format(config.tradertdir, stime, sym, '.txt')
         sTfilepath = os.path.join(stradeDir, sTfile)
 
-        sfile = '{0}_{1}_{2}{3}'.format(tradertdir, stime, sym, '.csv')
+        # for possible duplicated csv data
+        sfile = '{0}_{1}_{2}{3}'.format(config.tradertdir, stime, sym, '.csv')
+        stfile = os.path.join(stDir, sfile)
+        # for no-duplicated csv data
         sfilepath = os.path.join(stradeDir, sfile)
+
         sflag = 'price'
         rFind = False
         kklist = []
         vvlist = []
-        if os.path.exists(sfilepath):
-            with open(sfilepath, 'r', encoding='utf-8') as f:
+        if os.path.exists(stfile):
+            with open(stfile, 'r', encoding='utf-8') as f:
                 first_line = f.readline()  # 取第一行
                 rFind = sflag in first_line
-        with open(sfilepath, 'a+', encoding='utf-8', newline='') as f:
+        with open(stfile, 'a+', encoding='utf-8', newline='') as f:
             w = csv.writer(f)
             if rFind is True:
                 # vlist = list(data.values())
@@ -84,6 +90,11 @@ class MarketApp:
                 vvlist.insert(5, vlist[4])
                 w.writerow(vvlist)
         f.close()
+
+        # use pandas to remove duplicate data
+        df = pd.read_csv(stfile)
+        df = df.drop_duplicates(['ts'], keep='last')
+        df.to_csv(sfilepath, index=False)
 
         # write original data to txt files
         with open(sTfilepath, 'a+', encoding='utf-8') as tf:

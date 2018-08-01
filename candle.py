@@ -14,18 +14,14 @@ import csv
 import json
 import sys
 
-sDir_ = os.path.join(os.path.abspath('..'), '_data')
-sDir = os.path.join(os.path.abspath('..'), 'data')
-klinedir = 'kline'
-exchange = 'fcoin'
-mflag = 'M1'
+sDir_ = os.path.join(os.path.abspath('..'), config.sD_)
+sDir = os.path.join(os.path.abspath('..'), config.sD)
 khead = ['symbol', 'ts', 'tm_intv', 'id', 'open', 'close', 'low', 'high', 'amount', 'vol', 'count']
 
 
 class MarketApp:
     """
     """
-
     def __init__(self):
         self.client = FcoinClient()
         self.fcoin = Fcoin()
@@ -43,22 +39,22 @@ class MarketApp:
         # print('symbol: ', sym)
         # create the no-exist folder to save date
         stime = time.strftime('%Y%m%d', time.localtime())
-        stDir = os.path.join(sDir_, stime, exchange, klinedir)
-        stradeDir = os.path.join(sDir, stime, exchange, klinedir)
+        stDir = os.path.join(sDir_, stime, config.exchange, config.klinedir)
+        stradeDir = os.path.join(sDir, stime, config.exchange, config.klinedir)
         if not os.path.exists(stradeDir):
             os.makedirs(stradeDir)
-
+        # for possible duplicated csv data path
         if not os.path.exists(stDir):
             os.makedirs(stDir)
 
         # for original data
-        sTfile = '{0}_{1}_{2}{3}'.format(klinedir, stime, sym, '.txt')
+        sTfile = '{0}_{1}_{2}{3}'.format(config.klinedir, stime, sym, '.txt')
         sTfilepath = os.path.join(stradeDir, sTfile)
 
-        sfile = '{0}_{1}_{2}{3}'.format(klinedir, stime, sym, '.csv')
+        # for possible duplicated csv data
+        sfile = '{0}_{1}_{2}{3}'.format(config.klinedir, stime, sym, '.csv')
         stfilepath = os.path.join(stDir, sfile)
-
-        sfile = '{0}_{1}_{2}{3}'.format(klinedir, stime, sym, '.csv')
+        # for no-duplicated csv data
         sfilepath = os.path.join(stradeDir, sfile)
 
         sflag = 'close'
@@ -139,7 +135,7 @@ class MarketApp:
     # sync_trades
     def sync_kline(self, sym):
         self.client.stream.stream_klines.subscribe(self.candle)
-        self.client.subscribe_candle(sym, mflag)
+        self.client.subscribe_candle(sym, config.mflag)
 
     # 日志初始化
     def _init_log(self):

@@ -5,7 +5,7 @@
 import time
 import logging
 from threading import Thread
-
+import pandas as pd
 from fcoin import Fcoin
 from WSS.fcoin_client import FcoinClient
 import config
@@ -14,10 +14,8 @@ import csv
 import json
 import sys
 
-# sDir = os.path.join(os.path.abspath('..'), '..', 'Fcoin_DL')
-sDir = os.path.join(os.path.abspath('..'), 'data')
-tickerdir = 'ticker'
-exchange = 'fcoin'
+sDir_ = os.path.join(os.path.abspath('..'), config.sD_)
+sDir = os.path.join(os.path.abspath('..'), config.sD)
 
 
 class MarketApp:
@@ -36,27 +34,34 @@ class MarketApp:
         # print('symbol: ', sym)
         # create the no-exist folder to save date
         stime = time.strftime('%Y%m%d', time.localtime())
-        tickerDir = os.path.join(sDir, stime, exchange, tickerdir)
+        stDir = os.path.join(sDir_, stime, config.exchange, config.tickerdir)
+        tickerDir = os.path.join(sDir, stime, config.exchange, config.tickerdir)
         if not os.path.exists(tickerDir):
             os.makedirs(tickerDir)
-
+        if not os.path.exists(stDir):
+            os.makedirs(stDir)
         # 获取最新的深度明细
         ticker_head = []
         ticker_flag = 'latest_price'
 
         # for original data
-        sTfile = '{0}_{1}_{2}{3}'.format(tickerdir, stime, sym, '.txt')
+        sTfile = '{0}_{1}_{2}{3}'.format(config.tickerdir, stime, sym, '.txt')
         sTfilepath = os.path.join(tickerDir, sTfile)
-        # for csv data
-        tkfile = '{0}_{1}_{2}{3}'.format(tickerdir, stime, sym, '.csv')
+
+        # for possible duplicated csv data
+        tkfile = '{0}_{1}_{2}{3}'.format(config.tickerdir, stime, sym, '.csv')
+        tspath = os.path.join(stDir, tkfile)
+
+        # for no-duplicated csv data
         tkspath = os.path.join(tickerDir, tkfile)
+
         tklist = []
         rFind = False
-        if os.path.exists(tkspath):
-            with open(tkspath, 'r', encoding='utf-8') as f:
+        if os.path.exists(tspath):
+            with open(tspath, 'r', encoding='utf-8') as f:
                 first_line = f.readline()  # 取第一行
                 rFind = ticker_flag in first_line
-        with open(tkspath, 'a+', encoding='utf-8', newline='') as f:
+        with open(tspath, 'a+', encoding='utf-8', newline='') as f:
             w = csv.writer(f)
             if rFind is True:
                 self.addI2list(ts, tklist, sym, data['ticker'])
@@ -79,6 +84,11 @@ class MarketApp:
                 self.addI2list(ts, tklist, sym, data['ticker'])
                 w.writerow(tklist)
         f.close()
+
+        # use pandas to remove duplicate data
+        df = pd.read_csv(tspath)
+        df = df.drop_duplicates(['ts'], keep='last')
+        df.to_csv(tkspath, index=False)
 
         # write original data to txt files
         with open(sTfilepath, 'a+', encoding='utf-8') as tf:

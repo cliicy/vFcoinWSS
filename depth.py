@@ -5,7 +5,7 @@
 import time
 import logging
 from threading import Thread
-
+import pandas as pd
 from fcoin import Fcoin
 from WSS.fcoin_client import FcoinClient
 import config
@@ -14,17 +14,13 @@ import csv
 import json
 import sys
 
-# sDir = os.path.join(os.path.abspath('..'), '..', 'Fcoin_DL')
-sDir = os.path.join(os.path.abspath('..'), 'data')
-depthdir = 'depth'
-exchange = 'fcoin'
-dlevel = 'L20'
+sDir_ = os.path.join(os.path.abspath('..'), config.sD_)
+sDir = os.path.join(os.path.abspath('..'), config.sD)
 
 
 class MarketApp:
     """
     """
-
     def __init__(self):
         self.client = FcoinClient()
         self.fcoin = Fcoin()
@@ -37,9 +33,14 @@ class MarketApp:
         # print('symbol: ', sym)
         # create the no-exist folder to save date
         stime = time.strftime('%Y%m%d', time.localtime())
-        depthDir = os.path.join(sDir, stime, exchange, depthdir)
+        stDir = os.path.join(sDir_, stime, config.exchange, config.depthdir)
+        depthDir = os.path.join(sDir, stime, config.exchange, config.depthdir)
         if not os.path.exists(depthDir):
             os.makedirs(depthDir)
+
+        # for possible duplicated csv data path
+        if not os.path.exists(stDir):
+            os.makedirs(stDir)
 
         # 获取最新的深度明细
         # 买(卖)1价, 买(卖)1量
@@ -47,10 +48,14 @@ class MarketApp:
         depth_flag = 'depth'
 
         # for original data
-        sTfile = '{0}_{1}_{2}{3}'.format(depthdir, stime, sym, '.txt')
+        sTfile = '{0}_{1}_{2}{3}'.format(config.depthdir, stime, sym, '.txt')
         sTfilepath = os.path.join(depthDir, sTfile)
-        # for csv data
-        dpfile = '{0}_{1}_{2}{3}'.format(depthdir, stime, sym, '.csv')
+
+        # for possible duplicated csv data
+        dpfile = '{0}_{1}_{2}{3}'.format(config.depthdir, stime, sym, '.csv')
+        dtpath = os.path.join(stDir, dpfile)
+
+        # for no-duplicated csv data
         dpspath = os.path.join(depthDir, dpfile)
 
         bidlists = data['bids']
@@ -62,11 +67,11 @@ class MarketApp:
         rFind = False
         # depth_head = ['symbol', 'ts', 'depth', 'sell_price', 'buy_price', 'sell_amt', 'buy_amt']
         while idp < nask:
-            if os.path.exists(dpspath):
-                with open(dpspath, 'r', encoding='utf-8') as f:
+            if os.path.exists(dtpath):
+                with open(dtpath, 'r', encoding='utf-8') as f:
                     first_line = f.readline()  # 取第一行
                     rFind = depth_flag in first_line
-            with open(dpspath, 'a+', encoding='utf-8', newline='') as f:
+            with open(dtpath, 'a+', encoding='utf-8', newline='') as f:
                 w = csv.writer(f)
                 blst = bidlists[idp:idp + 2]
                 alst = asklists[idp:idp + 2]
@@ -81,6 +86,11 @@ class MarketApp:
                     w.writerow(balist)
                     idp += 2
         f.close()
+
+        # use pandas to remove duplicate data
+        df = pd.read_csv(dtpath)
+        df = df.drop_duplicates(['ts'], keep='last')
+        df.to_csv(dpspath, index=False)
 
         # write original data to txt files
         with open(sTfilepath, 'a+', encoding='utf-8') as tf:
@@ -105,7 +115,7 @@ class MarketApp:
     # sync_trades
     def sync_depth(self, sym):
         self.client.stream.stream_depth.subscribe(self.depth)
-        self.client.subscribe_depth(sym, dlevel)
+        self.client.subscribe_depth(sym, config.dlevel)
 
     # 日志初始化
     def _init_log(self):

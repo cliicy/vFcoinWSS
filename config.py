@@ -48,5 +48,21 @@ trade_head = ['amount', 'ts', 'id', 'side', 'price']
 # sylist = ['btcusdt', 'ethusdt', 'bchusdt', 'ltcusdt', 'ftusdt', 'fteth', 'etcusdt', 'ftbtc', 'bnbusdt', 'btmusdt']
 sylist = ['btcusdt', 'bchusdt', 'ethusdt', 'ltcusdt']
 # sylist = ['btcusdt']
+sD_ = '_data'
+sD = 'data'
+exchange = 'fcoin'
+
+# for ticker
+tickerdir = 'ticker'
 
 
+# for depthe
+depthdir = 'depth'
+dlevel = 'L20'
+
+# for candle
+klinedir = 'kline'
+mflag = 'M1'
+
+# for trade
+tradertdir = 'trader'
