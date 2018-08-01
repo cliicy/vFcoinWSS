@@ -5,7 +5,7 @@
 import time
 import logging
 from threading import Thread
-
+import pandas as pd
 from fcoin import Fcoin
 from WSS.fcoin_client import FcoinClient
 import config
@@ -14,7 +14,7 @@ import csv
 import json
 import sys
 
-# sDir = os.path.join(os.path.abspath('..'), '..', 'Fcoin_DL')
+sDir_ = os.path.join(os.path.abspath('..'), '_data')
 sDir = os.path.join(os.path.abspath('..'), 'data')
 klinedir = 'kline'
 exchange = 'fcoin'
@@ -31,6 +31,9 @@ class MarketApp:
         self.fcoin = Fcoin()
         self.fcoin.auth(config.key, config.secret)
         self.sym = ''
+        self.oldts = ''
+        self.wdata = {}
+        self.bwrite = False
         self._init_log()
 
     def candle(self, data):
@@ -40,29 +43,37 @@ class MarketApp:
         # print('symbol: ', sym)
         # create the no-exist folder to save date
         stime = time.strftime('%Y%m%d', time.localtime())
+        stDir = os.path.join(sDir_, stime, exchange, klinedir)
         stradeDir = os.path.join(sDir, stime, exchange, klinedir)
         if not os.path.exists(stradeDir):
             os.makedirs(stradeDir)
+
+        if not os.path.exists(stDir):
+            os.makedirs(stDir)
 
         # for original data
         sTfile = '{0}_{1}_{2}{3}'.format(klinedir, stime, sym, '.txt')
         sTfilepath = os.path.join(stradeDir, sTfile)
 
         sfile = '{0}_{1}_{2}{3}'.format(klinedir, stime, sym, '.csv')
+        stfilepath = os.path.join(stDir, sfile)
+
+        sfile = '{0}_{1}_{2}{3}'.format(klinedir, stime, sym, '.csv')
         sfilepath = os.path.join(stradeDir, sfile)
+
         sflag = 'close'
         rFind = False
         kklist = []
         vvlist = []
-        if os.path.exists(sfilepath):
-            with open(sfilepath, 'r', encoding='utf-8') as f:
+        if os.path.exists(stfilepath):
+            with open(stfilepath, 'r', encoding='utf-8') as f:
                 first_line = f.readline()  # 取第一行
                 rFind = sflag in first_line
-        with open(sfilepath, 'a+', encoding='utf-8', newline='') as f:
+        with open(stfilepath, 'a+', encoding='utf-8', newline='') as f:
             w = csv.writer(f)
             if rFind is True:
                 vlist = list(data.values())
-                self.additem2list(ts, vvlist, sym, ml, vlist)
+                self.additem2list(ts, vvlist, sym, '1m', vlist)
                 w.writerow(vvlist)
             else:  # khead = ['symbol', 'ts', 'tm_intv', 'id', 'open', 'close', 'low', 'high', 'amount', 'vol', 'count']
                 klist = list(data.keys())
@@ -80,9 +91,14 @@ class MarketApp:
                 kklist.insert(10, klist[5])
                 w.writerow(kklist)
                 vlist = list(data.values())
-                self.additem2list(ts, vvlist, sym, ml, vlist)
+                self.additem2list(ts, vvlist, sym, '1m', vlist)
                 w.writerow(vvlist)
         f.close()
+
+        # use pandas to remove duplicate data
+        df = pd.read_csv(stfilepath)
+        df = df.drop_duplicates(['ts'], keep='last')
+        df.to_csv(sfilepath, index=False)
 
         # write original data to txt files
         with open(sTfilepath, 'a+', encoding='utf-8') as tf:
