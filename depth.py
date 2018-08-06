@@ -44,7 +44,6 @@ class MarketApp:
         # write original data to txt files
         with open(sTfilepath, 'a+', encoding='utf-8') as tf:
             tf.writelines(json.dumps(data) + '\n')
-            tf.close()
 
         # for no-duplicated csv data
         dpfile = '{0}_{1}_{2}{3}'.format(config.depthdir, stime, sym, '.csv')
@@ -165,13 +164,13 @@ class MarketApp:
                 # balist.extend(bidlists[idp:idp + 2])
                 # balist.extend(asklists[idp:idp + 2])
                 if rFind is True:
-                    if idepth == level:  # only write the depthest data to csv
-                        w.writerow(balist)
+                    # if idepth == level:  # only write the depthest data to csv
+                    w.writerow(balist)
                     idp += 2
                 else:
                     w.writerow(depth_head)
-                    if idepth == level:  # only write the depthest data to csv
-                        w.writerow(balist)
+                    # if idepth == level:  # only write the depthest data to csv
+                    w.writerow(balist)
                     idp += 2
 
         # update the lenth of data wroten to csv

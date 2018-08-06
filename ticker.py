@@ -45,7 +45,6 @@ class MarketApp:
         # write original data to txt files
         with open(sTfilepath, 'a+', encoding='utf-8') as tf:
             tf.writelines(json.dumps(data) + '\n')
-            tf.close()
 
         # for no-duplicated csv data
         tkfile = '{0}_{1}_{2}{3}'.format(config.tickerdir, stime, sym, '.csv')
