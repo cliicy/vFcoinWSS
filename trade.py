@@ -26,22 +26,26 @@ class MarketApp:
         self.client = FcoinClient()
         self.fcoin = Fcoin()
         self.fcoin.auth(config.key, config.secret)
-        self._sender = MqSender('fcoin', 'trader')
+        self._sender = MqSender('fcoin', 'trade')
         self.sym = ''
         self.wdata = {}
         self._init_log()
 
     # write trade iformation
     def sync_tradesinfo(self, data):
+        name, sym = self.client.channel_config[0].split('.')
         # send to mq
         try:
-            self._sender.send(str(data))
+            mqdata = {}
+            tdata = {'symbol': sym, 'exchange': config.exchange}
+            mqdata.update(tdata)
+            mqdata.update(data)
+            # print(mqdata)
+            self._sender.send(str(mqdata))
         except Exception as error:
             print(error)
             self._sender.close()
         # send to mq
-
-        name, sym = self.client.channel_config[0].split('.')
         # print('symbol: ', sym)
         # create the no-exist folder to save date
         stime = time.strftime('%Y%m%d', time.localtime())

@@ -32,15 +32,19 @@ class MarketApp:
         self._init_log()
 
     def depth(self, data):
+        name, level, sym = self.client.channel_config[0].split('.')
         # send to mq
         try:
-            self._sender.send(str(data))
+            mqdata = {}
+            tdata = {'symbol': sym, 'level': level, 'exchange': config.exchange}
+            mqdata.update(tdata)
+            mqdata.update(data)
+            # print(mqdata)
+            self._sender.send(str(mqdata))
         except Exception as error:
             print(error)
             self._sender.close()
         # send to mq
-
-        name, level, sym = self.client.channel_config[0].split('.')
         # print('symbol: ', sym)
         # create the no-exist folder to save date
         stime = time.strftime('%Y%m%d', time.localtime())

@@ -32,16 +32,21 @@ class MarketApp:
         self._init_log()
 
     def ticker(self, data):
+        name, sym = self.client.channel_config[0].split('.')
+        ts = self.client.get_ts()
         # send to mq
         try:
-            self._sender.send(str(data))
+            mqdata = {}
+            tdata = {'symbol': sym, 'ts': ts, 'exchange': config.exchange}
+            mqdata.update(tdata)
+            mqdata.update(data)
+            # print(mqdata)
+            self._sender.send(str(mqdata))
         except Exception as error:
             print(error)
             self._sender.close()
         # send to mq
 
-        name, sym = self.client.channel_config[0].split('.')
-        ts = self.client.get_ts()
         # print('symbol: ', sym)
         # create the no-exist folder to save date
         stime = time.strftime('%Y%m%d', time.localtime())

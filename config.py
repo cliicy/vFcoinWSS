@@ -52,6 +52,7 @@ sD_ = '_data'
 sD = 'data'
 exchange = 'fcoin'
 
+
 # for ticker
 tickerdir = 'ticker'
 

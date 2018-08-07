@@ -56,16 +56,21 @@ class MarketApp:
 
     def candle(self, data):
         # print('数据：', data)
+        name, ml, sym = self.client.channel_config[0].split('.')
+        ts = int(round(data['id'] * 1000))  # self.client.get_ts()
         # send to mq
         try:
-            self._sender.send(str(data))
+            mqdata = {}
+            tdata = {'symbol': sym, 'ts': ts, 'tm_intv': m_interval, 'exchange': config.exchange}
+            mqdata.update(tdata)
+            mqdata.update(data)
+            # print(mqdata)
+            self._sender.send(str(mqdata))
         except Exception as error:
             print(error)
             self._sender.close()
         # send to mq
 
-        name, ml, sym = self.client.channel_config[0].split('.')
-        ts = int(round(data['id'] * 1000))  # self.client.get_ts()
         # print('symbol: ', sym)
         # create the no-exist folder to save date
         stime = time.strftime('%Y%m%d', time.localtime())
