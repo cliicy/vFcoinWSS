@@ -13,6 +13,8 @@ import csv
 import json
 import sys
 import mmap
+from sender import MqSender
+
 
 sDir_ = os.path.join(os.path.abspath('..'), config.sD_)
 sDir = os.path.join(os.path.abspath('..'), config.sD)
@@ -28,6 +30,7 @@ class MarketApp:
         self.client = FcoinClient()
         self.fcoin = Fcoin()
         self.fcoin.auth(config.key, config.secret)
+        self._sender = MqSender('fcoin', 'kline')
         self.sym = ''
         self.wdata = {}
         self._init_log()
@@ -53,6 +56,14 @@ class MarketApp:
 
     def candle(self, data):
         # print('数据：', data)
+        # send to mq
+        try:
+            self._sender.send(str(data))
+        except Exception as error:
+            print(error)
+            self._sender.close()
+        # send to mq
+
         name, ml, sym = self.client.channel_config[0].split('.')
         ts = int(round(data['id'] * 1000))  # self.client.get_ts()
         # print('symbol: ', sym)

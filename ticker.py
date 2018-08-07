@@ -13,6 +13,7 @@ import os
 import csv
 import json
 import sys
+from sender import MqSender
 
 sDir_ = os.path.join(os.path.abspath('..'), config.sD_)
 sDir = os.path.join(os.path.abspath('..'), config.sD)
@@ -25,11 +26,20 @@ class MarketApp:
         self.client = FcoinClient()
         self.fcoin = Fcoin()
         self.fcoin.auth(config.key, config.secret)
+        self._sender = MqSender('fcoin', 'ticker')
         self._sym = ''
         self.wdata = {}
         self._init_log()
 
     def ticker(self, data):
+        # send to mq
+        try:
+            self._sender.send(str(data))
+        except Exception as error:
+            print(error)
+            self._sender.close()
+        # send to mq
+
         name, sym = self.client.channel_config[0].split('.')
         ts = self.client.get_ts()
         # print('symbol: ', sym)
