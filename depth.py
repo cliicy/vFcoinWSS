@@ -33,6 +33,8 @@ class MarketApp:
 
     def depth(self, data):
         name, level, sym = self.client.channel_config[0].split('.')
+        # level = 'L20'
+        # sym = 'btcusdt'
         # send to mq
         try:
             mqdata = {}
@@ -144,7 +146,6 @@ class MarketApp:
         depth_head = ['symbol', 'ts', 'depth', 'sell_price', 'buy_price', 'sell_amt', 'buy_amt']
         depth_flag = 'depth'
         # 存放要写入CVSV的数据data
-        balist = []
         # will delete the data from the end if the ts is the same to the previous data
         iseekpos = self.wdata['wlen']
         # print('iseekpos= '+'{0}'.format(iseekpos))
@@ -158,13 +159,13 @@ class MarketApp:
         # print(bidlists)
         asklists = data['asks']
         # print(asklists)
-        # iloops = 0
         idp = 0
         nask = len(bidlists)
         rFind = False
         # depth_head = ['symbol', 'ts', 'depth', 'sell_price', 'buy_price', 'sell_amt', 'buy_amt']
         level = int(level.lstrip('L'))
         # print('{0}'.format(level))
+        nwdatalen = 0
         while idp < nask:
             if os.path.exists(sfilepath):
                 with open(sfilepath, 'r', encoding='utf-8') as f:
@@ -176,6 +177,15 @@ class MarketApp:
                 alst = asklists[idp:idp + 2]
                 idepth = 1 + idp / 2
                 balist = [sym, data['ts'], idepth, alst[0], blst[0], alst[1], blst[1]]
+
+                # update the lenth of data wroten to csv
+                prelen = -1  # 多了一个逗号 所以从-1开始
+                for item in balist:
+                    ss = '{0}{1}'.format(',', item)
+                    # print('depth数据=', ss.strip())
+                    prelen += len(ss)
+                nwdatalen += prelen
+                nwdatalen += len('\t\n')
                 # balist.extend(bidlists[idp:idp + 2])
                 # balist.extend(asklists[idp:idp + 2])
                 if rFind is True:
@@ -188,20 +198,16 @@ class MarketApp:
                     w.writerow(balist)
                     idp += 2
 
-        # update the lenth of data wroten to csv
-        prelen = -1  # 多了一个逗号 所以从-1开始
-        # print('prelen= ' + '{0}'.format(prelen))
-        for item in balist:
-            ss = '{0}{1}'.format(',', item)
-            prelen += len(ss)
-        prelen += len('\t\n')  # because there is a extra '\t\n' which is equal 2 bytes
-        # print('w2csv prelen= ' + '{0}'.format(prelen))
-        self.wdata['wlen'] = prelen
-        # print('w2csv after prelen= ' + '{0}'.format(self.wdata['wlen']))
+        self.wdata['wlen'] = nwdatalen
         # update the lenth of data wroten to csv
 
 
 if __name__ == '__main__':
+    # trun = MarketApp()
+    # data1 = {"bids": [6519.49, 0.0118, 6519.46, 0.03, 6519.14, 0.06, 6518.21, 0.0012, 6517.53, 0.03, 6515.57, 0.0275, 6515.04, 0.0012, 6514.47, 0.2606, 6514.3, 0.0012, 6514.2, 0.004, 6513.66, 0.03, 6513.65, 0.03, 6513.64, 0.03, 6513.63, 0.03, 6512.24, 0.01, 6512.23, 0.0121, 6512.18, 0.6, 6511.71, 0.03, 6509.77, 0.0567, 6509.76, 0.03], "asks": [6521.92, 0.0115, 6522.96, 0.003, 6523.38, 0.01, 6523.42, 0.003, 6524.66, 0.003, 6525.28, 0.0012, 6525.34, 0.03, 6525.88, 0.0001, 6527.3, 0.0387, 6527.79, 0.003, 6528.3, 0.0012, 6529.26, 0.09, 6529.39, 0.003, 6529.43, 0.0121, 6529.49, 0.003, 6529.75, 0.003, 6529.83, 0.0012, 6529.96, 0.006, 6530.53, 0.26, 6530.77, 0.003], "ts": 1533710558007, "seq": 169519420}
+    # data2 = {"bids": [6519.49, 0.0118, 6519.46, 0.03, 6519.14, 0.06, 6518.21, 0.0012, 6517.53, 0.03, 6515.57, 0.0275, 6515.04, 0.0012, 6514.47, 0.2606, 6514.3, 0.0012, 6514.2, 0.004, 6513.66, 0.03, 6513.65, 0.03, 6513.64, 0.03, 6513.63, 0.03, 6512.24, 0.01, 6512.23, 0.0121, 6512.18, 0.6, 6511.71, 0.03, 6509.77, 0.0567, 6509.76, 0.03], "asks": [6521.92, 0.0115, 6522.96, 0.003, 6523.38, 0.01, 6523.42, 0.003, 6524.66, 0.003, 6525.28, 0.0012, 6525.34, 0.03, 6525.88, 0.0001, 6527.3, 0.0387, 6527.79, 0.003, 6528.3, 0.0012, 6529.26, 0.09, 6529.39, 0.003, 6529.43, 0.0121, 6529.49, 0.003, 6529.75, 0.003, 6529.83, 0.0012, 6529.96, 0.006, 6530.53, 0.26, 6530.77, 0.003], "ts": 1533710558007, "seq": 169519420}
+    # trun.depth(data1)
+    # trun.depth(data2)
     run = MarketApp()
     run.sym = sys.argv[1]
     thread = Thread(target=run.loop)
