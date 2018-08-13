@@ -70,6 +70,6 @@ mflag = 'M1'
 tradertdir = 'trader'
 
 # for rabbitmq
-rabbitmq_host = "172.24.132.207"
-rabbitmq_username = "guest"
-rabbitmq_pwd = "guest"
+rabbitmq_host = "47.254.77.27"
+rabbitmq_username = "root"
+rabbitmq_pwd = "root"
