@@ -60,6 +60,7 @@ class MarketApp:
         ts = int(round(data['id'] * 1000))  # self.client.get_ts()
         # 从服务器得到的数据中没有ts，只有id，根据文档要求，要把获取到数据的时间存入csv文件及数据库中
         ticks = int(round(time.time() * 1000))
+        data['id'] = ts
         # print("当前时间戳为:", ticks)
         # send to mq
         try:
@@ -126,6 +127,8 @@ class MarketApp:
             if rFind is True:
                 vlist = list(data.values())
                 self.additem2list(ts, vvlist, sym, m_interval, vlist)
+                # print("1要写入的货币对：" + vvlist[0])
+                # vvlist[0] = 'aaaa'
                 w.writerow(vvlist)
             else:  # khead = ['symbol', 'ts', 'tm_intv', 'id', 'open', 'close', 'low', 'high', 'amount', 'vol', 'count']
                 klist = list(data.keys())
@@ -144,6 +147,8 @@ class MarketApp:
                 w.writerow(kklist)
                 vlist = list(data.values())
                 self.additem2list(ts, vvlist, sym, m_interval, vlist)
+                # print("2要写入的货币对："+vvlist[0])
+                # vvlist[0] = 'aaaa'
                 w.writerow(vvlist)
 
         # update the lenth of data wroten to csv
@@ -161,11 +166,11 @@ class MarketApp:
     # add extral items to the original list
     def additem2list(self, ts, vvlist, sym, ml, vlist):
         self.sym = sym  # acutally it will not be used just for fix the warnning error
+        # print('sym='+self.sym)
         vvlist.insert(0, sym)
         vvlist.insert(1, ts)
         vvlist.insert(2, ml)
-        # vvlist.insert(3, vlist[4])
-        vvlist.insert(3, vlist[4] * 1000)
+        vvlist.insert(3, vlist[4])
         vvlist.insert(4, vlist[0])
         vvlist.insert(5, vlist[1])
         vvlist.insert(6, vlist[6])
