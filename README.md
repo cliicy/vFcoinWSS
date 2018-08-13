@@ -31,4 +31,5 @@ https://developer.fcoin.com
 内部git server:
 http://10.0.131.49:10101/summary/quaninvest.git
 
-
+How to run on Linux:
+./run_fcoin.sh > fcoin_run.log 2>&1 &
