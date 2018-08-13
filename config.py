@@ -2,6 +2,7 @@
 #!-*-coding:utf-8 -*-
 # @TIME    : 2018/7/26/0011 10:17
 # @Author  : Luo
+import os
 
 # 秘钥
 key = '55b6353945d14944bece3b5bc8d42580'
@@ -49,7 +50,7 @@ trade_head = ['amount', 'ts', 'id', 'side', 'price']
 sylist = ['btcusdt', 'bchusdt', 'ethusdt', 'ltcusdt']
 # sylist = ['btcusdt']
 sD_ = '_data'
-sD = 'data'
+sD = '/data' if os.environ.get("SHELL", "") else 'data'
 exchange = 'fcoin'
 
 
