@@ -33,7 +33,9 @@ class MarketApp:
 
     def ticker(self, data):
         name, sym = self.client.channel_config[0].split('.')
-        ts = self.client.get_ts()
+        # ts = self.client.get_ts()
+        # 从服务器得到的数据中没有ts，也没有id，根据文档要求，要把获取到数据的时间存入csv文件及数据库中
+        ts = int(round(time.time() * 1000))
         # send to mq
         try:
             mqdata = {}

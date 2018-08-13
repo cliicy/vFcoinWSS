@@ -58,10 +58,13 @@ class MarketApp:
         # print('数据：', data)
         name, ml, sym = self.client.channel_config[0].split('.')
         ts = int(round(data['id'] * 1000))  # self.client.get_ts()
+        # 从服务器得到的数据中没有ts，只有id，根据文档要求，要把获取到数据的时间存入csv文件及数据库中
+        ticks = int(round(time.time() * 1000))
+        # print("当前时间戳为:", ticks)
         # send to mq
         try:
             mqdata = {}
-            tdata = {'symbol': sym, 'ts': ts, 'tm_intv': m_interval, 'exchange': config.exchange}
+            tdata = {'symbol': sym, 'ts': ticks, 'tm_intv': m_interval, 'exchange': config.exchange}
             mqdata.update(tdata)
             mqdata.update(data)
             # print(mqdata)
@@ -98,7 +101,7 @@ class MarketApp:
         else:
             self.wdata['ts'] = ts
             self.wdata['wlen'] = 0
-        self.w2csv(sfilepath, ts, sym, data)
+        self.w2csv(sfilepath, ticks, sym, data)  # 是要把ticks写入csv,而不是和id值一致的ts
 
     def w2csv(self, sfilepath, ts, sym, data):
         sflag = 'close'
