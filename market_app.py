@@ -2,13 +2,8 @@
 # @TIME    : 2018/7/21/0011 15:32
 # @Author  : Luo
 
-import time
 import logging
-from collections import defaultdict
-from threading import Thread
 from multiprocessing import Process
-from fcoin import Fcoin
-from WSS.fcoin_client import FcoinClient
 import config
 import subprocess
 
@@ -43,23 +38,6 @@ def do_ticker(sym):
 
 class MarketApp:
     def __init__(self):
-        self.client = FcoinClient()
-        self.fcoin = Fcoin()
-        self.fcoin.auth(config.key, config.secret)
-        self.ts = None  # 深度更新时间
-        self.market_price = None  # 市价
-        self.market_trade_list = None
-        self.total_bids = 0
-        self.total_asks = 0
-        self.filled_buy_order_list = []
-        self.order_list = defaultdict(lambda: None)
-        self.buy_order_id = None
-        self.dic_balance = defaultdict(lambda: None)
-        self.time_order = time.time()
-        #
-        self.price_list = []
-        self.candle_list = []
-        self.SMA = None
         self._init_log()
 
     # 日志初始化
@@ -84,42 +62,28 @@ class MarketApp:
         console.setFormatter(formatter)
         self._log.addHandler(console)
 
-    # 循环
     def loop(self):
-        self.client.start()
-        while not self.client.isConnected:
-            self._log.info('waitting……')
-            time.sleep(1)
-
+        self._log
         # create 4 processes to get depth data parallelly
         for sy in config.sylist:
-            p = Process(target=do_depth, args=(sy,))
+            pdepth = Process(target=do_depth, args=(sy,))
             print('syncing depth information will start.')
-            p.start()
+            pdepth.start()
 
-        # create 4 processes to get trades data parallelly
-        for sy in config.sylist:
-            # self.do_trades(sy)
-            p = Process(target=do_trades, args=(sy,))
+            ptrade = Process(target=do_trades, args=(sy,))
             print('syncing trades information will start.')
-            p.start()
+            ptrade.start()
 
-        # create 4 processes to get kline data parallelly
-        for sy in config.sylist:
-            p = Process(target=do_kline, args=(sy,))
+            pkline = Process(target=do_kline, args=(sy,))
             print('syncing kline information will start.')
-            p.start()
+            pkline.start()
 
-        # create 4 processes to get ticker data parallelly
-        for sy in config.sylist:
-            p = Process(target=do_ticker, args=(sy,))
+            pticker = Process(target=do_ticker, args=(sy,))
             print('syncing ticker information will start.')
-            p.start()
+            pticker.start()
 
 
 if __name__ == '__main__':
     run = MarketApp()
-    thread = Thread(target=run.loop)
-    thread.start()
-    thread.join()
+    run.loop()
     print('done to trigger depth ticker kline trades')
