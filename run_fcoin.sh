@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python3 market_app.py
+python market_app.py

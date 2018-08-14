@@ -33,3 +33,6 @@ http://10.0.131.49:10101/summary/quaninvest.git
 
 How to run on Linux:
 ./run_fcoin.sh > fcoin_run.log 2>&1 &
+
+How to start rabbitmq:
+service rabbitmq-server start
