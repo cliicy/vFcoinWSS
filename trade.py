@@ -35,16 +35,20 @@ class MarketApp:
     def sync_tradesinfo(self, data):
         name, sym = self.client.channel_config[0].split('.')
         # send to mq
-        try:
-            mqdata = {}
-            tdata = {'symbol': sym, 'exchange': config.exchange}
-            mqdata.update(tdata)
-            mqdata.update(data)
-            # print(mqdata)
-            self._sender.send(str(mqdata))
-        except Exception as error:
-            print(error)
-            self._sender.close()
+        if not self._sender:
+            try:
+                mqdata = {}
+                tdata = {'symbol': sym, 'exchange': config.exchange}
+                mqdata.update(tdata)
+                mqdata.update(data)
+                # print(mqdata)
+                self._sender.send(str(mqdata))
+            except Exception as error:
+                print(error)
+                self._sender.close()
+        else:
+            # print('fail to connect rabbitmq server')
+            pass
         # send to mq
         # print('symbol: ', sym)
         # create the no-exist folder to save date

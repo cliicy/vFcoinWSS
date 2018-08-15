@@ -76,6 +76,12 @@ tradertdir = 'trader'
 
 
 # for rabbitmq 2
-rabbitmq_host = "172.24.132.207"
-rabbitmq_username = "guest"
-rabbitmq_pwd = "guest"
+# rabbitmq_host = "172.24.132.207"
+# rabbitmq_username = "guest"
+# rabbitmq_pwd = "guest"
+
+# for rabbitmq 2
+rabbitmq_host = "u217p36506.iok.la"
+rabbitmq_port = "37429"
+rabbitmq_username = "wuxiaobing"
+rabbitmq_pwd = "wuxiaobing"

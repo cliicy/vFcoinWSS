@@ -37,16 +37,20 @@ class MarketApp:
         # 从服务器得到的数据中没有ts，也没有id，根据文档要求，要把获取到数据的时间存入csv文件及数据库中
         ts = int(round(time.time() * 1000))
         # send to mq
-        try:
-            mqdata = {}
-            tdata = {'symbol': sym, 'ts': ts, 'exchange': config.exchange}
-            mqdata.update(tdata)
-            mqdata.update(data)
-            # print(mqdata)
-            self._sender.send(str(mqdata))
-        except Exception as error:
-            print(error)
-            self._sender.close()
+        if not self._sender:
+            try:
+                mqdata = {}
+                tdata = {'symbol': sym, 'ts': ts, 'exchange': config.exchange}
+                mqdata.update(tdata)
+                mqdata.update(data)
+                # print(mqdata)
+                self._sender.send(str(mqdata))
+            except Exception as error:
+                print(error)
+                self._sender.close()
+        else:
+            # print('fail to connect rabbitmq server')
+            pass
         # send to mq
 
         # print('symbol: ', sym)
