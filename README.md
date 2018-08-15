@@ -32,7 +32,12 @@ https://developer.fcoin.com
 http://10.0.131.49:10101/summary/quaninvest.git
 
 How to run on Linux:
-./run_fcoin.sh > fcoin_run.log 2>&1 &
+# ./run_fcoin.sh > fcoin_run.log 2>&1 &
+./dofcoin.sh
+
+How to upload data to 131.49:
+pushd X:\20180815
+scp -r root@47.254.77.27:/yanjiuyuan/data/20180815/fcoin/ .
 
 How to start rabbitmq:
 service rabbitmq-server start

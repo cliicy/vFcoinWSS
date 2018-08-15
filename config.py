@@ -14,7 +14,7 @@ trade_head = ['amount', 'ts', 'id', 'side', 'price']
 sylist = ['btcusdt', 'bchusdt', 'ethusdt', 'ltcusdt']
 # sylist = ['btcusdt']
 sD_ = '_data'
-sD = '/data' if os.environ.get("SHELL", "") else 'data'
+sD = '/yanjiuyuan/data' if os.environ.get("SHELL", "") else 'data'
 exchange = 'fcoin'
 
 
