@@ -18,8 +18,11 @@ class MqSender:
         username = self.rabbitmq_username  # 指定远程rabbitmq的用户名密码
         pwd = self.rabbitmq_pwd
         user_pwd = pika.PlainCredentials(username, pwd)
-        self.s_conn = pika.BlockingConnection(pika.ConnectionParameters(self.rabbitmq_host, credentials=user_pwd))  # 创建连接
-        print("isopen", self.s_conn.is_open)
+        try:
+            self.s_conn = pika.BlockingConnection(pika.ConnectionParameters(self.rabbitmq_host, credentials=user_pwd))  # 创建连接
+        except Exception as e:
+            print(e)
+            return None 
         self.chan = self.s_conn.channel()  # 在连接上创建一个频道
         self.queue_name = '%s_%s' % (platform, data_type)
         self.chan.queue_declare(queue=self.queue_name)  # 声明一个队列，生产者和消费者都要声明一个相同的队列，用来防止万一某一方挂了，另一方能正常运行
