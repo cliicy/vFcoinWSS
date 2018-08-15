@@ -63,16 +63,20 @@ class MarketApp:
         data['id'] = ts
         # print("当前时间戳为:", ticks)
         # send to mq
-        try:
-            mqdata = {}
-            tdata = {'symbol': sym, 'ts': ticks, 'tm_intv': m_interval, 'exchange': config.exchange}
-            mqdata.update(tdata)
-            mqdata.update(data)
-            # print(mqdata)
-            self._sender.send(str(mqdata))
-        except Exception as error:
-            print(error)
-            self._sender.close()
+        if not self._sender:
+            try:
+                mqdata = {}
+                tdata = {'symbol': sym, 'ts': ticks, 'tm_intv': m_interval, 'exchange': config.exchange}
+                mqdata.update(tdata)
+                mqdata.update(data)
+                # print(mqdata)
+                self._sender.send(str(mqdata))
+            except Exception as error:
+                print(error)
+                self._sender.close()
+        else:
+            # print('fail to connect rabbitmq server')
+            pass
         # send to mq
 
         # print('symbol: ', sym)

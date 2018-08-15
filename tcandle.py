@@ -76,7 +76,7 @@ class MarketApp:
                 print(error)
                 self._sender.close()
         else:
-            #print('fail to connect rabbitmq server')
+            # print('fail to connect rabbitmq server')
             pass
         # send to mq
 
