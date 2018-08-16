@@ -3,7 +3,6 @@ import logging
 import time
 import datetime
 from threading import Thread, Event
-import json
 
 
 class Connection(Thread):
@@ -92,8 +91,6 @@ class Connection(Thread):
         self._reconnect_required.set()
         if self._socket:
             self._socket.close()
-
-
 
     def _on_open(self, ws):
         self._log.debug('连接成功')

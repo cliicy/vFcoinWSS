@@ -14,6 +14,8 @@ import json
 import sys
 import mmap
 from sender import MqSender
+from enums import Symbol
+from enums import Platform
 
 sDir_ = os.path.join(os.path.abspath('..'), config.sD_)
 sDir = os.path.join(os.path.abspath('..'), config.sD)
@@ -32,7 +34,8 @@ class MarketApp:
         self._init_log()
 
     def depth(self, data):
-        name, level, sym = self.client.channel_config[0].split('.')
+        name, level, osym = self.client.channel_config[0].split('.')
+        sym = Symbol.convert_to_standard_symbol(Platform.PLATFORM_FCOIN, osym)
         # send to mq
         if not self._sender:
             try:
@@ -58,14 +61,14 @@ class MarketApp:
             os.makedirs(depthDir)
 
         # for original data
-        sTfile = '{0}_{1}_{2}{3}'.format(config.depthdir, stime, sym, '.txt')
+        sTfile = '{0}_{1}_{2}{3}'.format(config.depthdir, stime, osym, '.txt')
         sTfilepath = os.path.join(depthDir, sTfile)
         # write original data to txt files
         with open(sTfilepath, 'a+', encoding='utf-8') as tf:
             tf.writelines(json.dumps(data) + '\n')
 
         # for no-duplicated csv data
-        dpfile = '{0}_{1}_{2}{3}'.format(config.depthdir, stime, sym, '.csv')
+        dpfile = '{0}_{1}_{2}{3}'.format(config.depthdir, stime, osym, '.csv')
         dpspath = os.path.join(depthDir, dpfile)
         if self.wdata:
             if ts in self.wdata.values():

@@ -14,10 +14,12 @@ import csv
 import json
 import sys
 from sender import MqSender
+from enums import Symbol
+from enums import Platform
+
 
 sDir_ = os.path.join(os.path.abspath('..'), config.sD_)
 sDir = os.path.join(os.path.abspath('..'), config.sD)
-
 
 class MarketApp:
     """
@@ -33,7 +35,8 @@ class MarketApp:
 
     # write trade iformation
     def sync_tradesinfo(self, data):
-        name, sym = self.client.channel_config[0].split('.')
+        name, osym = self.client.channel_config[0].split('.')
+        sym = Symbol.convert_to_standard_symbol(Platform.PLATFORM_FCOIN, osym)
         # send to mq
         if not self._sender:
             try:
@@ -59,14 +62,14 @@ class MarketApp:
             os.makedirs(stradeDir)
         ts = data['ts']
         # for original data
-        sTfile = '{0}_{1}_{2}{3}'.format(config.tradertdir, stime, sym, '.txt')
+        sTfile = '{0}_{1}_{2}{3}'.format(config.tradertdir, stime, osym, '.txt')
         sTfilepath = os.path.join(stradeDir, sTfile)
         # write original data to txt files
         with open(sTfilepath, 'a+', encoding='utf-8') as tf:
             tf.writelines(json.dumps(data) + '\n')
 
         # for no-duplicated csv data
-        sfile = '{0}_{1}_{2}{3}'.format(config.tradertdir, stime, sym, '.csv')
+        sfile = '{0}_{1}_{2}{3}'.format(config.tradertdir, stime, osym, '.csv')
         sfilepath = os.path.join(stradeDir, sfile)
         if self.wdata:
             if ts in self.wdata.values():
