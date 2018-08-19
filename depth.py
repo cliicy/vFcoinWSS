@@ -3,9 +3,9 @@
 # @Author  : Luo
 
 import time
-import logging
+from basesync import sDir
 from threading import Thread
-from fcoin import Fcoin
+from basesync import BaseSync
 from WSS.fcoin_client import FcoinClient
 import config
 import os
@@ -16,24 +16,24 @@ import mmap
 from sender import MqSender
 from enums import Symbol
 from enums import Platform
-
-sDir_ = os.path.join(os.path.abspath('..'), config.sD_)
-sDir = os.path.join(os.path.abspath('..'), config.sD)
+from enums import PlatformDataType
 
 
-class MarketApp:
+class DepthApp(BaseSync):
     """
     """
     def __init__(self):
+
+        self.platform = Platform.PLATFORM_FCOIN.value
+        self.data_type = PlatformDataType.PLATFORM_DATA_DEPTH.value
+        BaseSync(self.platform, self.data_type)
         self.client = FcoinClient()
-        self.fcoin = Fcoin()
-        self.fcoin.auth(config.key, config.secret)
-        self._sender = MqSender('fcoin', 'depth')
-        self.sym = ''
-        self.wdata = {}
         self._init_log()
+        self._sender = MqSender('fcoin', 'depth')
+        self.wdata = {}
 
     def depth(self, data):
+        print(data)
         name, level, osym = self.client.channel_config[0].split('.')
         sym = Symbol.convert_to_standard_symbol(Platform.PLATFORM_FCOIN, osym)
         # send to mq
@@ -52,7 +52,7 @@ class MarketApp:
             # print('fail to connect rabbitmq server')
             pass
         # send to mq
-        # print('symbol: ', sym)
+        print('symbol: ', sym)
         # create the no-exist folder to save date
         stime = time.strftime('%Y%m%d', time.localtime())
         ts = data['ts']
@@ -83,66 +83,10 @@ class MarketApp:
             self.wdata['wlen'] = 0
         self.w2csv(dpspath, sym, data, level)
 
-    # 循环
-    def loop(self):
-        self.client.start()
-        while not self.client.isConnected:
-            self._log.info('waitting……')
-            time.sleep(1)
-
-        self.sync_depth(self.sym)
-        while True:
-            try:
-                pass
-            except Exception as error:
-                print(error)
-            time.sleep(1)
-
     # sync_trades
-    def sync_depth(self, sym):
+    def sync_data(self, *args):
         self.client.stream.stream_depth.subscribe(self.depth)
-        self.client.subscribe_depth(sym, config.dlevel)
-
-    # 日志初始化
-    def _init_log(self):
-        self._log = logging.getLogger(__name__)
-        self._log.setLevel(level=logging.INFO)
-        formatter = logging.Formatter('%(asctime)s - %(message)s')  # 格式
-
-        '''
-        保存文档
-        '''
-        handler = logging.FileHandler("app.log")
-        handler.setLevel(logging.INFO)
-        handler.setFormatter(formatter)
-        self._log.addHandler(handler)
-
-        '''
-        控制台显示
-        '''
-        console = logging.StreamHandler()
-        console.setLevel(logging.INFO)
-        console.setFormatter(formatter)
-        self._log.addHandler(console)
-
-    # self.deleteFromMmap(sfilepath, size-iseekpos,size)
-    def deleteFromMmap(self, filename, start, end, lastline=False):
-        self.sym = self.sym  # acutally it will not be used just for fix the warnning error
-        f = open(filename, "r+")
-        VDATA = mmap.mmap(f.fileno(), 0)
-        size = len(VDATA)
-        if lastline is True:
-            start = size - start
-            end = size
-        else:
-            pass
-        length = end - start
-        newsize = size - length
-        VDATA.move(start, end, size - end)
-        VDATA.flush()
-        VDATA.close()
-        f.truncate(newsize)
-        f.close()
+        self.client.subscribe_depth(args[1], args[0])
 
     def w2csv(self, sfilepath, sym, data, level):
         # 获取最新的深度明细
@@ -156,7 +100,7 @@ class MarketApp:
         # print('iseekpos= '+'{0}'.format(iseekpos))
         if iseekpos > 0:
             # print('will call deleteFromMmap')
-            self.deleteFromMmap(sfilepath, iseekpos, 0, True)
+            self.delline(sfilepath, iseekpos, 0, True)
         # will delete the data from the end if the ts is the same to the one of the previous data
         else:
             pass
@@ -208,9 +152,9 @@ class MarketApp:
 
 
 if __name__ == '__main__':
-    run = MarketApp()
+    run = DepthApp()
     run.sym = sys.argv[1]
-    thread = Thread(target=run.loop)
+    thread = Thread(target=run.run)
     thread.start()
     thread.join()
     print('done')

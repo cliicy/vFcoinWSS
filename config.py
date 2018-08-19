@@ -29,6 +29,7 @@ dlevel = 'L20'
 # for candle
 klinedir = 'kline'
 mflag = 'M1'
+kline_interval = '1m'
 
 # for trade
 tradertdir = 'trader'

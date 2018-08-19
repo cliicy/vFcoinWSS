@@ -27,7 +27,7 @@ class MqSender:
             print('cannot open', sys.exc_info()[0])
             return None
         except Exception as err:
-            print("Unexpected error:", err)
+            print("sender Unexpected error:", err)
             raise
             return None
         print("isopen", self.s_conn.is_open)
