@@ -16,22 +16,22 @@ import sys
 from sender import MqSender
 from enums import Symbol
 from enums import Platform
+from basesync import BaseSync
+from enums import PlatformDataType
+from basesync import sDir
 
-sDir_ = os.path.join(os.path.abspath('..'), config.sD_)
-sDir = os.path.join(os.path.abspath('..'), config.sD)
 
-
-class MarketApp:
+class TickerApp(BaseSync):
     """
     """
     def __init__(self):
+        self.platform = Platform.PLATFORM_FCOIN.value
+        self.data_type = PlatformDataType.PLATFORM_DATA_TICKER.value
+        BaseSync(self.platform, self.data_type)
         self.client = FcoinClient()
-        self.fcoin = Fcoin()
-        self.fcoin.auth(config.key, config.secret)
-        self._sender = MqSender('fcoin', 'ticker')
-        self._sym = ''
-        self.wdata = {}
         self._init_log()
+        self._sender = MqSender('fcoin', 'ticker')
+        self.wdata = {}
 
     def ticker(self, data):
         name, osym = self.client.channel_config[0].split('.')
@@ -93,7 +93,7 @@ class MarketApp:
         # print('iseekpos= '+'{0}'.format(iseekpos))
         if iseekpos > 0:
             # print('will call deleteFromMmap')
-            self.deleteFromMmap(tspath, iseekpos, 0, True)
+            self.delline(tspath, iseekpos, 0, True)
         # will delete the data from the end if the ts is the same to the one of the previous data
         else:
             pass
@@ -142,44 +142,10 @@ class MarketApp:
         # print('w2csv after prelen= ' + '{0}'.format(self.wdata['wlen']))
         # update the lenth of data wroten to csv
 
-    # self.deleteFromMmap(sfilepath, size-iseekpos,size)
-    def deleteFromMmap(self, filename, start, end, lastline=False):
-        self._sym = self._sym  # acutally it will not be used just for fix the warnning error
-        f = open(filename, "r+")
-        VDATA = mmap.mmap(f.fileno(), 0)
-        size = len(VDATA)
-        if lastline is True:
-            start = size - start
-            end = size
-        else:
-            pass
-        length = end - start
-        newsize = size - length
-        VDATA.move(start, end, size - end)
-        VDATA.flush()
-        VDATA.close()
-        f.truncate(newsize)
-        f.close()
-
-    # 循环
-    def loop(self):
-        self.client.start()
-        while not self.client.isConnected:
-            self._log.info('waitting……')
-            time.sleep(1)
-
-        self.sync_ticker(self._sym)
-        while True:
-            try:
-                pass
-            except Exception as error:
-                print(error)
-            time.sleep(1)
-
     # sync_trades
-    def sync_ticker(self, sym):
+    def sync_data(self, *args):
         self.client.stream.stream_ticker.subscribe(self.ticker)
-        self.client.subscribe_ticker(sym)
+        self.client.subscribe_ticker(args[0])
 
     # add extral items to the original list
     # ['symbol', 'ts', 'latest_price', 'latest_amount', 'max_buy1_price', 'max_buy1_amt',
@@ -187,8 +153,8 @@ class MarketApp:
     #        'pre_24h_bt_finish_amt', 'pre_24h_usd_finish_amt']
     # 最新成交价,最近一笔成交的成交量,最大买一价,最大买一量,最小卖一价,最小卖一量,24小时前成交价,24小时内最高价,
     # 24小时内最低价,24小时内基准货币成交量,24小时内计价货币成交量
-    def addI2list(self, ts, vvlist, sym, vlist):
-        self._sym = sym  # acutally it will not be used
+    @staticmethod
+    def addI2list(ts, vvlist, sym, vlist):
         vvlist.insert(0, sym)
         vvlist.insert(1, ts)
         vvlist.insert(2, vlist[0])
@@ -203,33 +169,11 @@ class MarketApp:
         vvlist.insert(11, vlist[9])
         vvlist.insert(12, vlist[10])
 
-    # 日志初始化
-    def _init_log(self):
-        self._log = logging.getLogger(__name__)
-        self._log.setLevel(level=logging.INFO)
-        formatter = logging.Formatter('%(asctime)s - %(message)s')  # 格式
-
-        '''
-        保存文档
-        '''
-        handler = logging.FileHandler("app.log")
-        handler.setLevel(logging.INFO)
-        handler.setFormatter(formatter)
-        self._log.addHandler(handler)
-
-        '''
-        控制台显示
-        '''
-        console = logging.StreamHandler()
-        console.setLevel(logging.INFO)
-        console.setFormatter(formatter)
-        self._log.addHandler(console)
-
 
 if __name__ == '__main__':
-    run = MarketApp()
+    run = TickerApp()
     run._sym = sys.argv[1]
-    thread = Thread(target=run.loop)
+    thread = Thread(target=run.run)
     thread.start()
     thread.join()
     print('ticker finished')

@@ -12,7 +12,6 @@ import os
 import csv
 import json
 import sys
-import mmap
 from sender import MqSender
 from enums import Symbol
 from enums import Platform
@@ -33,7 +32,7 @@ class DepthApp(BaseSync):
         self.wdata = {}
 
     def depth(self, data):
-        print(data)
+        # print(data)
         name, level, osym = self.client.channel_config[0].split('.')
         sym = Symbol.convert_to_standard_symbol(Platform.PLATFORM_FCOIN, osym)
         # send to mq
@@ -52,7 +51,7 @@ class DepthApp(BaseSync):
             # print('fail to connect rabbitmq server')
             pass
         # send to mq
-        print('symbol: ', sym)
+        # print('symbol: ', sym)
         # create the no-exist folder to save date
         stime = time.strftime('%Y%m%d', time.localtime())
         ts = data['ts']
