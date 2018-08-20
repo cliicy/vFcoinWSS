@@ -11,7 +11,7 @@ secret = 'e5f615e4d88d47a082a1b0f263fb8309'
 
 trade_head = ['amount', 'ts', 'id', 'side', 'price']
 # sylist = ['btcusdt', 'ethusdt', 'bchusdt', 'ltcusdt', 'ftusdt', 'fteth', 'etcusdt', 'ftbtc', 'bnbusdt', 'btmusdt']
-sylist = ['btcusdt', 'bchusdt', 'ethusdt', 'ltcusdt']
+sylist = ['btcusdt', 'bchusdt', 'ethusdt', 'ltcusdt', 'xrpusdt']
 # sylist = ['btcusdt']
 sD_ = '_data'
 sD = '/yanjiuyuan/data' if os.environ.get("SHELL", "") else 'data'
