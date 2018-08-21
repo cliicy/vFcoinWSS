@@ -40,7 +40,7 @@ class TickerApp(BaseSync):
         # 从服务器得到的数据中没有ts，也没有id，根据文档要求，要把获取到数据的时间存入csv文件及数据库中
         ts = int(round(time.time() * 1000))
         # send to mq
-        if not self._sender:
+        if self._sender is not None:
             try:
                 mqdata = {}
                 tdata = {'symbol': sym, 'ts': ts, 'exchange': config.exchange}

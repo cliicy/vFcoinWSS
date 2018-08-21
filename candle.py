@@ -43,7 +43,7 @@ class CandleApp(BaseSync):
         data['id'] = ts
         # print("当前时间戳为:", ticks)
         # send to mq
-        if not self._sender:
+        if self._sender is not None:
             try:
                 mqdata = {}
                 tdata = {'symbol': sym, 'ts': ticks, 'tm_intv': m_interval, 'exchange': config.exchange}

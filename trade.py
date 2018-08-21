@@ -92,7 +92,7 @@ class TradeApp(BaseSync):
         name, osym = self.client.channel_config[0].split('.')
         sym = Symbol.convert_to_standard_symbol(Platform.PLATFORM_FCOIN, osym)
         # send to mq
-        if not self._sender:
+        if self._sender is not None:
             try:
                 mqdata = {}
                 tdata = {'symbol': sym, 'exchange': config.exchange}
