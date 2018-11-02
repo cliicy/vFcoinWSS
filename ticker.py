@@ -198,7 +198,7 @@ class TickerApp(BaseSync):
         ybdd['Low'] = vlist[8]
 
         # Volume pre_24h_usd_finish_amt 24小时内计价货币成交量
-        ybdd['Volume'] = vlist[10]
+        ybdd['Volume'] = round(vlist[10], 2)
 
         dfcoin_coll = sdb[mdb["fcoin"]]
         dfcoin_coll.update({'sym': ybdd['sym']}, {'$set': {'Price': ybdd['Price'], 'Change': ybdd['Change'],
