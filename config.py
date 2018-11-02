@@ -55,3 +55,12 @@ rabbitmq_host = "51facai.51vip.biz"
 rabbitmq_port = "50896"
 rabbitmq_username = "guest"
 rabbitmq_pwd = "guest"
+
+emongodb = {
+    "host": '172.24.132.208',
+    "user": 'data',
+    "password": 'data123',
+    "db": 'invest',
+    "port": '27017',
+    "fcoin": 'fcoin'
+}
