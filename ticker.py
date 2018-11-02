@@ -195,14 +195,14 @@ class TickerApp(BaseSync):
         ybdd['High'] = vlist[7]
 
         # Low pre_24h_price_min 24小时内最低价
-        ybdd['High'] = vlist[8]
+        ybdd['Low'] = vlist[8]
 
         # Volume pre_24h_usd_finish_amt 24小时内计价货币成交量
         ybdd['Volume'] = vlist[10]
 
         dfcoin_coll = sdb[mdb["fcoin"]]
-        dfcoin_coll.update({'Change': ybdd['Change'], 'Price': ybdd['Price'], 'Volume': ybdd['Volume']},
-                           {'$set': ybdd}, True)
+        dfcoin_coll.update({'sym': ybdd['sym']}, {'$set': {'Change': ybdd['Change'], 'High': ybdd['High'],
+                                                           'Low': ybdd['Low'], 'Volume': ybdd['Volume']}}, True)
 
 
 if __name__ == '__main__':

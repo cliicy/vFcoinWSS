@@ -57,10 +57,11 @@ rabbitmq_username = "guest"
 rabbitmq_pwd = "guest"
 
 emongodb = {
-    "host": '172.24.132.208',
+    # "host": '172.24.132.208',
+    "host": '51facai.51vip.biz',
     "user": 'data',
     "password": 'data123',
     "db": 'invest',
-    "port": '27017',
+    "port": '16538',
     "fcoin": 'fcoin'
 }
