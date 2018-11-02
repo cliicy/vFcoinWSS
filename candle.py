@@ -30,7 +30,8 @@ class CandleApp(BaseSync):
         BaseSync(self.platform, self.data_type)
         self.client = FcoinClient()
         self._init_log()
-        self._sender = MqSender('fcoin', 'kline')
+        self._sender = MqSender('3', 'kline')
+        #self._sender = MqSender('fcoin', 'kline')
         self.wdata = {}
 
     def candle(self, data):

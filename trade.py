@@ -27,7 +27,7 @@ class TradeApp(BaseSync):
         BaseSync(self.platform, self.data_type)
         self.client = FcoinClient()
         self._init_log()
-        self._sender = MqSender('fcoin', 'trade')
+        self._sender = MqSender('3', 'trade')
         self.wdata = {}
 
     def w2csv(self, sfilepath, sym, data):

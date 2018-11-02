@@ -46,7 +46,12 @@ tradertdir = 'trader'
 # rabbitmq_pwd = "guest"
 
 # for rabbitmq 2
-rabbitmq_host = "u217p36506.iok.la"
-rabbitmq_port = "37429"
-rabbitmq_username = "wuxiaobing"
-rabbitmq_pwd = "wuxiaobing"
+#rabbitmq_host = "u217p36506.iok.la"
+#rabbitmq_port = "37429"
+#rabbitmq_username = "wuxiaobing"
+#rabbitmq_pwd = "wuxiaobing"
+
+rabbitmq_host = "51facai.51vip.biz"
+rabbitmq_port = "50896"
+rabbitmq_username = "guest"
+rabbitmq_pwd = "guest"

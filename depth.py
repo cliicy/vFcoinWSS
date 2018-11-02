@@ -28,7 +28,7 @@ class DepthApp(BaseSync):
         BaseSync(self.platform, self.data_type)
         self.client = FcoinClient()
         self._init_log()
-        self._sender = MqSender('fcoin', 'depth')
+        self._sender = MqSender('3', 'depth')
         self.wdata = {}
 
     def depth(self, data):

@@ -7,11 +7,11 @@ class Platform(Enum):
     """
     交易平台枚举
     """
-    PLATFORM_HUOBI = "huobi"
-    PLATFORM_BINANCE = "binance"
-    PLATFORM_FCOIN = "fcoin"
-    PLATFORM_OKEX = "okex"
-    PLATFORM_OKEX_FUTURE = "okex_future"
+    PLATFORM_HUOBI = "1"
+    PLATFORM_BINANCE = "2"
+    PLATFORM_FCOIN = "3"
+    PLATFORM_OKEX = "5"
+    PLATFORM_OKEX_FUTURE = "4"
 
 
 @unique
@@ -111,13 +111,18 @@ class PlatformDataTypeIndex(Enum):
                 return PlatformDataTypeIndex.OKEX_FUTURE_DEPTH_DB_INDEX.value
 
 
-HUOBI_SYMBOL_LIST = ['btcusdt','bchusdt', 'ethusdt', 'ltcusdt', 'eosusdt', 'ethbtc', 'eosbtc', 'xrpusdt']
+HUOBI_SYMBOL_LIST = ['btcusdt', 'bchusdt', 'ethusdt', 'ltcusdt', 'eosusdt', 'ethbtc', 'eosbtc', 'xrpusdt']
 BINANCE_SYMBOL_LIST = ['BTCUSDT', 'BCCUSDT', 'ETHUSDT', 'LTCUSDT', 'EOSUSDT', 'ETHBTC', 'EOSBTC', 'XRPUSDT']
-OKEX_SYMBOL_LIST = ['btc_usdt', 'bch_usdt', 'eth_usdt', 'ltc_usdt', 'eos_usdt', 'eth_btc', 'eos_btc', 'xrp_usdt']
+OKEX_SYMBOL_LIST = ['btc_usdt', 'bch_usdt', 'eth_usdt', 'ltc_usdt', 'eos_usdt', 'eth_btc', 'eos_btc', 'xrp_usdt', 'bch_btc', "ltc_btc",  "xrp_btc", "bch_eth",  "ltc_eth", "eos_eth", "xrp_eth"]
 OKEX_FUTURE_SYMBOL_LIST = ['btc_usd', 'bch_usd', 'eth_usd', 'ltc_usd', 'eos_usd', None, None, 'xrp_usd']
 FCOIN_SYMBOL_LIST = ['btcusdt', 'bchusdt', 'ethusdt', 'ltcusdt', None, None, None, 'xrpusdt']
-STANDARD_SYMBOL_LIST = ["BTC/USDT", "BCH/USDT", "ETH/USDT", "LTC/USDT", "EOS/USDT", "ETH/BTC", "EOS/BTC", "XRP/BTC"]
+STANDARD_SYMBOL_LIST = ["BTC/USDT", "BCH/USDT", "ETH/USDT", "LTC/USDT", "EOS/USDT", "ETH/BTC", "EOS/BTC", "XRP/USDT", "BCH/BTC", "LTC/BTC",  "XRP/BTC", "BCH/ETH",  "LTC/ETH", "EOS/ETH", "XRP/ETH"]
 
+@unique
+class Coin(Enum):
+    """
+    币枚举
+    """
 
 @unique
 class Symbol(Enum):
@@ -131,7 +136,30 @@ class Symbol(Enum):
     EOS_USDT = 4
     ETH_BTC = 5
     EOS_BTC = 6
-    XRP_BTC = 7
+    XRP_USDT = 7
+    BCH_BTC = 8
+    LTC_BTC = 9
+    XRP_BTC = 10
+    BCH_ETH = 11
+    LTC_ETH = 12
+    EOS_ETH = 13
+    XRP_ETH = 14
+
+    @staticmethod
+    def get_base_symbol(platform):
+        list = []
+        if (platform.value == Platform.PLATFORM_HUOBI.value):
+            pass
+        elif (platform.value == Platform.PLATFORM_BINANCE.value):
+            pass
+        elif (platform.value == Platform.PLATFORM_OKEX.value):
+            list.append(Symbol.BTC_USDT)
+            list.append(Symbol.ETH_USDT)
+        elif (platform.value == Platform.PLATFORM_OKEX_FUTURE.value):
+            pass
+        elif (platform.value == Platform.PLATFORM_FCOIN.value):
+            pass
+        return list
 
     @staticmethod
     def get_currency_pair(platform, symbol):
@@ -198,12 +226,14 @@ class Symbol(Enum):
         elif (platform.value == Platform.PLATFORM_OKEX.value):
             index = OKEX_SYMBOL_LIST.index(symbol)
             return STANDARD_SYMBOL_LIST[index]
-        elif (platform.value == Platform.PLATFORM_OKEX_FUTURE.value):
+        elif (platform.value == Platform.PLATFORM_OKEX_FUTURE.value and symbol in OKEX_FUTURE_SYMBOL_LIST):
             index = OKEX_FUTURE_SYMBOL_LIST.index(symbol)
             return STANDARD_SYMBOL_LIST[index]
         elif (platform.value == Platform.PLATFORM_FCOIN.value):
             index = FCOIN_SYMBOL_LIST.index(symbol)
             return STANDARD_SYMBOL_LIST[index]
+        else:
+            return None
 
     @staticmethod
     def convert_to_platform_symbol(platform, symbol):
@@ -230,6 +260,17 @@ class Symbol(Enum):
             return FCOIN_SYMBOL_LIST[index]
 
     @staticmethod
+    def get_symbol(symbol):
+        """
+        获得平台货币对
+        :param platform:平台枚举
+        :param symbol:标准货币对
+        :return:
+        """
+        index = STANDARD_SYMBOL_LIST.index(symbol)
+        return Symbol(index)
+
+    @staticmethod
     def get_platform_symbol(platform, currency_pair):
         """
         获得平台货币对
@@ -247,7 +288,7 @@ class Symbol(Enum):
             index = currency_pair.value
             return OKEX_SYMBOL_LIST[index]
         elif (platform.value == Platform.PLATFORM_OKEX_FUTURE.value):
-            index =currency_pair.value
+            index = currency_pair.value
             return OKEX_FUTURE_SYMBOL_LIST[index]
         elif (platform.value == Platform.PLATFORM_FCOIN.value):
             index = currency_pair.value
@@ -265,6 +306,159 @@ class Symbol(Enum):
         return STANDARD_SYMBOL_LIST[index]
 
 
+class ContractType(Enum):
+    """
+    合约类型枚举
+    """
+    THIS_WEEK = "this_week"
+    NEXT_WEEK = "next_week"
+    QUARTER = "quarter"
+
+
+STANDARD_TRADE_TYPE_LIST = ["buy", "sell"]
+OKEX_TRADE_TYPE_LIST = ["buy", "sell"]
+BINANCE_TRADE_TYPE_LIST = ["BUY", "SELL"]
+HUOBI_TRADE_TYPE_LIST = ["buy-limit", "sell-limit"]
+
+
+class TradeType(Enum):
+    """
+    交易（下单类型）buy/sell
+    """
+    BUY = 0
+    SELL = 1
+
+    @staticmethod
+    def get_trade_type(platform, platform_trade_type):
+        """
+        获得下单类型枚举
+        :param symbol:标准下单类型
+        :return:
+        """
+        if (platform.value == Platform.PLATFORM_HUOBI.value):
+            index = HUOBI_TRADE_TYPE_LIST.index(platform_trade_type)
+        elif (platform.value == Platform.PLATFORM_BINANCE.value):
+            index =  BINANCE_TRADE_TYPE_LIST.index(platform_trade_type)
+        elif (platform.value == Platform.PLATFORM_OKEX.value):
+            index = OKEX_TRADE_TYPE_LIST.index(platform_trade_type)
+        elif (platform.value == Platform.PLATFORM_FCOIN.value):
+            # TODO
+            pass
+        return TradeType(index)
+
+    @staticmethod
+    def get_standerd_type(trade_type_enum):
+        return STANDARD_TRADE_TYPE_LIST[trade_type_enum.value]
+
+    @staticmethod
+    def convert_to_standerd_type(platform, platform_trade_type):
+        if (platform.value == Platform.PLATFORM_HUOBI.value):
+            index = HUOBI_TRADE_TYPE_LIST.index(platform_trade_type)
+        elif (platform.value == Platform.PLATFORM_BINANCE.value):
+            index =  BINANCE_TRADE_TYPE_LIST.index(platform_trade_type)
+        elif (platform.value == Platform.PLATFORM_OKEX.value):
+            index = OKEX_TRADE_TYPE_LIST.index(platform_trade_type)
+        elif (platform.value == Platform.PLATFORM_FCOIN.value):
+            # TODO
+            pass
+        return TradeType.get_standerd_type(TradeType(index))
+
+    @staticmethod
+    def get_platform_type(platform, trade_type_enum):
+        """
+        获得平台下单类型
+        :param platform:
+        :param trade_type:
+        :return:
+        """
+        if (platform.value == Platform.PLATFORM_HUOBI.value):
+            index = trade_type_enum.value
+            return HUOBI_TRADE_TYPE_LIST[index]
+        elif (platform.value == Platform.PLATFORM_BINANCE.value):
+            index = trade_type_enum.value
+            return BINANCE_TRADE_TYPE_LIST[index]
+        elif (platform.value == Platform.PLATFORM_OKEX.value):
+            index = trade_type_enum.value
+            return OKEX_TRADE_TYPE_LIST[index]
+        elif (platform.value == Platform.PLATFORM_FCOIN.value):
+            # TODO
+            pass
+
+
+class FutureTradeType(Enum):
+    """
+    合约交易（下单类型）1:开多 2:开空 3:平多 4:平空
+    """
+    # 开多
+    OPENING_BULL = '1'
+    # 开空
+    OPENING_BEAR = '2'
+    # 平多
+    CLOSE_BULL = '3'
+    # 平空
+    CLOSE_BEAR = '4'
+
+
+class TransStatus(Enum):
+    """
+    交易状态
+    """
+    # 未开始
+    NOT_STARTED = "0"
+    # 部分完成
+    PARTIALLY = "1"
+    # 已完成
+    COMPLETED = "2"
+    # 已撤单
+    WITHDRAWAL = "-1"
+    # 撤单处理中
+    WITHDRAWAL_PROCESSING = "4"
+
+    @staticmethod
+    def get_status_by_platform(platform, status):
+        _status = str(status)
+        # okex futrue订单状态(0等待成交 1部分成交 2全部成交 -1撤单 4撤单处理中 5撤单中)
+        if platform == Platform.PLATFORM_OKEX_FUTURE:
+            if _status == "5":
+                return TransStatus.WITHDRAWAL_PROCESSING.value
+            else:
+                return _status
+        #  okex 订单状态(-1:已撤销  0: 未成交 1: 部分成交 2: 完全成交 3: 撤单处理中)
+        elif platform == Platform.PLATFORM_OKEX:
+            if _status == "3":
+                return TransStatus.WITHDRAWAL_PROCESSING.value
+            else:
+                return _status
+        else:
+            return _status
+
+
+class TransInstStatus(Enum):
+    """
+    策略实例状态(开仓；开仓已完成；平仓；完成)
+    """
+    # 开仓
+    OPEN_ORDER = "0"
+    # 开仓已完成
+    OPEN_COMPLET = "1"
+    # 平仓
+    CLOSE_OUT = "2"
+    # 完成
+    COMPLET = "3"
+
+
+class TransType(Enum):
+    """
+    挂单类型(开仓；平仓；爆仓)
+    """
+    # 开仓
+    OPEN_ORDER = "0"
+    # 平仓
+    CLOSE_OUT = "1"
+    # 爆仓
+    OUT_OF_SPACE = "2"
+
+
 if __name__ == '__main__':
     cp_enum = Symbol.get_currency_pair(Platform.PLATFORM_BINANCE, "BCCUSDT")
     print(cp_enum)
@@ -276,6 +470,7 @@ if __name__ == '__main__':
     print(symbol)
     st_symbol = Symbol.get_standard_symbol(Symbol.BCH_USDT)
     print(st_symbol)
+    print(Symbol.get_symbol("BTC/USDT"))
 
-    for enum in FCOIN_SYMBOL_LIST:
-        print(enum)
+    print(TradeType.convert_to_standerd_type(Platform.PLATFORM_BINANCE, "SELL"))
+    print(TradeType.get_platform_type(Platform.PLATFORM_BINANCE, TradeType.BUY))

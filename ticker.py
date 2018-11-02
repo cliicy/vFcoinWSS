@@ -30,7 +30,7 @@ class TickerApp(BaseSync):
         BaseSync(self.platform, self.data_type)
         self.client = FcoinClient()
         self._init_log()
-        self._sender = MqSender('fcoin', 'ticker')
+        self._sender = MqSender('3', 'ticker')
         self.wdata = {}
 
     def ticker(self, data):
