@@ -7,7 +7,6 @@ from threading import Thread
 import config
 import os
 import csv
-import json
 import sys
 from sender import MqSender
 from enums import Symbol
@@ -18,16 +17,15 @@ from WSS.fcoin_client import FcoinClient
 
 khead = ['symbol', 'ts', 'tm_intv', 'id', 'open', 'close', 'low', 'high', 'amount', 'vol', 'count']
 dkey = ['id', 'open', 'close', 'low', 'high', 'quote_vol', 'base_vol', 'count']
-m_interval = '1m'
 
 
-class CandleApp(BaseSync):
+class W1CandleApp(BaseSync):
     """
     """
     def __init__(self):
         self.platform = Platform.PLATFORM_FCOIN.value
         self.data_type = PlatformDataType.PLATFORM_DATA_KLINE.value
-        self.interval = 'M1'
+        self.interval = 'W1'
         BaseSync(self.platform, self.data_type, self.interval)
         self.client = FcoinClient()
         self._init_log()
@@ -45,20 +43,20 @@ class CandleApp(BaseSync):
         data['id'] = ts
         # print("当前时间戳为:", ticks)
         # send to mq
-        if self._sender is not None:
-            try:
-                mqdata = {}
-                tdata = {'symbol': sym, 'ts': ticks, 'tm_intv': m_interval, 'exchange': config.exchange}
-                mqdata.update(tdata)
-                mqdata.update(data)
-                # print(mqdata)
-                self._sender.send(str(mqdata))
-            except Exception as error:
-                print(error)
-                self._sender.close()
-        else:
-            # print('fail to connect rabbitmq server')
-            pass
+        # if self._sender is not None:
+        #     try:
+        #         mqdata = {}
+        #         tdata = {'symbol': sym, 'ts': ticks, 'tm_intv': m_interval, 'exchange': config.exchange}
+        #         mqdata.update(tdata)
+        #         mqdata.update(data)
+        #         # print(mqdata)
+        #         self._sender.send(str(mqdata))
+        #     except Exception as error:
+        #         print(error)
+        #         self._sender.close()
+        # else:
+        #     # print('fail to connect rabbitmq server')
+        #     pass
         # send to mq
 
         # print('symbol: ', sym)
@@ -68,13 +66,13 @@ class CandleApp(BaseSync):
         if not os.path.exists(skldir):
             os.makedirs(skldir)
         # for original data
-        sTfile = '{0}_{1}_{2}{3}'.format(config.klinedir, stime, osym, '.txt')
-        sTfilepath = os.path.join(skldir, sTfile)
-        # write original data to txt files
-        with open(sTfilepath, 'a+', encoding='utf-8') as tf:
-            tf.writelines(json.dumps(data) + '\n')
+        # sTfile = '{0}_{1}_{2}_{3}{4}'.format(config.klinedir, stime, ml, osym, '.txt')
+        # sTfilepath = os.path.join(skldir, sTfile)
+        # # write original data to txt files
+        # with open(sTfilepath, 'a+', encoding='utf-8') as tf:
+        #     tf.writelines(json.dumps(data) + '\n')
         # for no-duplicated csv data
-        sfile = '{0}_{1}_{2}{3}'.format(config.klinedir, stime, osym, '.csv')
+        sfile = '{0}_{1}_{2}_{3}{4}'.format(config.klinedir, stime, ml, osym, '.csv')
         sfilepath = os.path.join(skldir, sfile)
         if self.wdata:
             if ts in self.wdata.values():
@@ -132,7 +130,7 @@ class CandleApp(BaseSync):
                 w.writerow(vvlist)
 
         # update the lenth of data wroten to csv
-        prelen = len('{0},{1},{2}'.format(sym, ts, m_interval))
+        prelen = len('{0},{1},{2}'.format(sym, ts, self.interval))
         # print('prelen= ' + '{0}'.format(prelen))
         for i in dkey:
             ss = '{0}{1}'.format(',', data[i])
@@ -150,7 +148,7 @@ class CandleApp(BaseSync):
 
 if __name__ == '__main__':
     print('kline main')
-    run = CandleApp()
+    run = W1CandleApp()
     run.sym = sys.argv[1]
     thread = Thread(target=run.run)
     thread.start()

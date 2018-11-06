@@ -3,10 +3,10 @@
 # @Author  : Luo
 
 import time
-import logging
+# import logging
 from threading import Thread
-import mmap
-from fcoin import Fcoin
+# import mmap
+# from fcoin import Fcoin
 from WSS.fcoin_client import FcoinClient
 import config
 import os
@@ -19,14 +19,8 @@ from enums import Platform
 from basesync import BaseSync
 from enums import PlatformDataType
 from basesync import sDir
+from config import dw_coll
 
-from config import emongodb as mdb
-from pymongo import MongoClient
-mongo_url = 'mongodb://' + mdb["user"] + \
-            ':' + mdb["password"] + '@' + mdb["host"] + ':' + \
-            mdb["port"] + '/' + mdb["db"]
-conn = MongoClient(mongo_url)
-sdb = conn[mdb["db"]]
 ybdd = {}
 
 
@@ -190,20 +184,18 @@ class TickerApp(BaseSync):
         # 涨跌幅 Change 需要自己计算 或从网页爬取
         delta = '0.11'
         ybdd['Change'] = delta + '%'
-
         # High  pre_24h_price_max 24小时内最高价
         ybdd['High'] = vlist[7]
-
         # Low pre_24h_price_min 24小时内最低价
         ybdd['Low'] = vlist[8]
-
+        ybdd['exchange'] = 'fcoin'
+        ybdd['info_name'] = 'ticker'
         # Volume pre_24h_usd_finish_amt 24小时内计价货币成交量
         ybdd['Volume'] = round(vlist[10], 2)
-
-        dfcoin_coll = sdb[mdb["fcoin"]]
-        dfcoin_coll.update({'sym': ybdd['sym']}, {'$set': {'Price': ybdd['Price'], 'Change': ybdd['Change'],
+        dw_coll.update({'sym': ybdd['sym']}, {'$set': {'Price': ybdd['Price'], 'Change': ybdd['Change'],
                                                            'High': ybdd['High'], 'Low': ybdd['Low'],
-                                                           'Volume': ybdd['Volume']}}, True)
+                                                           'Volume': ybdd['Volume'], 'exchange': 'fcoin',
+                                                           'info_name': 'ticker'}}, True)
 
 
 if __name__ == '__main__':

@@ -8,6 +8,7 @@ import time
 from fcoin import Fcoin
 import config
 import mmap
+from config import sdb, mdb
 
 
 fcoin = Fcoin()
@@ -16,9 +17,10 @@ sDir = os.path.join(os.path.abspath('..'), config.sD)
 
 
 class BaseSync(object):
-    def __init__(self, platform, data_type):
+    def __init__(self, platform, data_type, interval):
         self.data_type = data_type
         self.platform = platform
+        self.interval = interval
         # self._init_log()
 
     def run(self, *args):
@@ -35,8 +37,8 @@ class BaseSync(object):
             time.sleep(0.5)
 
     # add extral items to the original list
-    @staticmethod
-    def additem2list(ts, vvlist, sym, ml, vitem):
+    # @staticmethod
+    def additem2list(self, ts, vvlist, sym, ml, vitem):
         vvlist.insert(0, sym)
         vvlist.insert(1, ts)
         if ml == 'M1':  # when solution is M1, we will write 1m to csv
@@ -50,6 +52,40 @@ class BaseSync(object):
         vvlist.insert(8, vitem['quote_vol'])
         vvlist.insert(9, vitem['base_vol'])
         vvlist.insert(10, vitem['count'])
+
+        # 把 下面的实时数据写入 Mongodb中
+        # 'high' 最高价
+        # 'low' 最低价
+        # open 开盘价
+        # close 收盘价
+        # count
+        # base_vol 基准货币成交量
+        # quote_vol 计价货币成交量
+        # 货币对
+        ybdd = {}
+        ybdd['sym'] = sym
+        ybdd['_id'] = '{0}_{1}_{2}'.format(vitem['id'], vitem['seq'], vitem['quote_vol'])
+        # 间隔时间
+        ybdd['interval'] = ml
+        # 开盘价格
+        ybdd['open'] = vitem['open']
+        # 最高价格
+        ybdd['high'] = vitem['high']
+        # 最低价
+        ybdd['low'] = vitem['low']
+        # 涨跌幅 Change 需要自己计算 或从网页爬取
+        delta = '0.01'
+        ybdd['Change'] = delta + '%'
+        # close
+        ybdd['close'] = vitem['close']
+        # count
+        ybdd['count'] = vitem['count']
+        # quote_vol 计价货币成交量
+        ybdd['quote_vol'] = round(vitem['quote_vol'], 2)
+        ybdd['exchange'] = 'fcoin'
+        ybdd['info_name'] = 'kline'
+        coll = sdb[mdb[self.interval]]
+        coll.insert(ybdd)
 
     # self.deleteFromMmap(sfilepath, size-iseekpos,size)
     @staticmethod
@@ -91,3 +127,4 @@ class BaseSync(object):
         console.setLevel(logging.INFO)
         console.setFormatter(formatter)
         self._log.addHandler(console)
+
