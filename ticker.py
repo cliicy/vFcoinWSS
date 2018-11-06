@@ -194,7 +194,7 @@ class TickerApp(BaseSync):
         ticker_coll.update({'sym': ybdd['sym']}, {'$set': {'Price': ybdd['Price'], 'Change': ybdd['Change'],
                                                            'High': ybdd['High'], 'Low': ybdd['Low'],
                                                            'Volume': ybdd['Volume'], 'exchange': 'fcoin',
-                                                           'info_name': 'ticker'}}, True)
+                                                           'api': 'ticker'}}, True)
 
 
 if __name__ == '__main__':
