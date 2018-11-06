@@ -77,7 +77,7 @@ mongo_url = 'mongodb://' + mdb["user"] + \
             mdb["port"] + '/' + mdb["db"]
 conn = MongoClient(mongo_url)
 sdb = conn[mdb["db"]]
-dw_coll = sdb[mdb["M1"]]
+ticker_coll = sdb[mdb["marketP1"]]
 dwM1_coll = sdb[mdb["M1"]]
 dwM5_coll = sdb[mdb["M5"]]
 dwD1_coll = sdb[mdb["D1"]]

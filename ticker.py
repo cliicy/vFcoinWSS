@@ -19,9 +19,7 @@ from enums import Platform
 from basesync import BaseSync
 from enums import PlatformDataType
 from basesync import sDir
-from config import dw_coll
-
-ybdd = {}
+from config import ticker_coll
 
 
 class TickerApp(BaseSync):
@@ -178,6 +176,7 @@ class TickerApp(BaseSync):
         # pre_24h_price_min 24小时内最低价
         # pre_24h_usd_finish_amt 24小时内计价货币成交量
         # 货币对
+        ybdd = {}
         ybdd['sym'] = sym
         # 价格 Price  latest_price
         ybdd['Price'] = vlist[0]
@@ -192,7 +191,7 @@ class TickerApp(BaseSync):
         ybdd['info_name'] = 'ticker'
         # Volume pre_24h_usd_finish_amt 24小时内计价货币成交量
         ybdd['Volume'] = round(vlist[10], 2)
-        dw_coll.update({'sym': ybdd['sym']}, {'$set': {'Price': ybdd['Price'], 'Change': ybdd['Change'],
+        ticker_coll.update({'sym': ybdd['sym']}, {'$set': {'Price': ybdd['Price'], 'Change': ybdd['Change'],
                                                            'High': ybdd['High'], 'Low': ybdd['Low'],
                                                            'Volume': ybdd['Volume'], 'exchange': 'fcoin',
                                                            'info_name': 'ticker'}}, True)
