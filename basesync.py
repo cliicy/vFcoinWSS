@@ -17,7 +17,7 @@ sDir = os.path.join(os.path.abspath('..'), config.sD)
 
 
 class BaseSync(object):
-    def __init__(self, platform, data_type, interval):
+    def __init__(self, platform, data_type, interval=''):
         self.data_type = data_type
         self.platform = platform
         self.interval = interval

@@ -64,7 +64,7 @@ mdb = {
     "password": 'data123',
     "db": 'invest',
     "port": '16538',
-    "marketPage1": 'dw_market',
+    "marketP1": 'dw_market',
     "M5": 'dw_M5',
     "D1": 'dw_D1',
     "H1": 'dw_H1',
