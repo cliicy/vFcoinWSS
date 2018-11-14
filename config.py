@@ -58,13 +58,13 @@ rabbitmq_username = "guest"
 rabbitmq_pwd = "guest"
 
 mdb = {
-    "host": '172.24.132.208',
-    # "host": '51facai.51vip.biz',
+    # "host": '172.24.132.208',
+    "host": '51facai.51vip.biz',
     "user": 'data',
     "password": 'data123',
     "db": 'invest',
-    "port": '27017',
-    # "port": '16538',
+    # "port": '27017',
+    "port": '16538',
     "marketP1": 'dw_market',
     "M5": 'dw_M5',
     "D1": 'dw_D1',
