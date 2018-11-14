@@ -31,7 +31,11 @@ class TickerApp(BaseSync):
         BaseSync(self.platform, self.data_type)
         self.client = FcoinClient()
         self._init_log()
-        self._sender = MqSender('3', 'ticker')
+        try:
+            self._sender = MqSender('3', 'ticker')
+        except Exception as e:
+            print('ohhh== ERROR= ', e)
+            self._sender = None
         self.wdata = {}
 
     def ticker(self, data):
@@ -42,6 +46,7 @@ class TickerApp(BaseSync):
         ts = int(round(time.time() * 1000))
         # send to mq
         if self._sender is not None:
+            # print('aaaa {0}'.format(self._sender))
             try:
                 mqdata = {}
                 tdata = {'symbol': sym, 'ts': ts, 'exchange': config.exchange}
@@ -53,7 +58,7 @@ class TickerApp(BaseSync):
                 print(error)
                 self._sender.close()
         else:
-            # print('fail to connect rabbitmq server')
+            print('fail to connect rabbitmq server')
             pass
         # send to mq
 
@@ -181,8 +186,10 @@ class TickerApp(BaseSync):
         # 价格 Price  latest_price
         ybdd['Price'] = vlist[0]
         # 涨跌幅 Change 需要自己计算 或从网页爬取
-        delta = '0.11'
-        ybdd['Change'] = delta + '%'
+        # delta = '0.11'
+        ff = (vlist[0] - vlist[6]) / vlist[6]*100
+        delta = ('%.2f' % ff)
+        ybdd['Change'] = '{0}{1}'.format(delta, '%')
         # High  pre_24h_price_max 24小时内最高价
         ybdd['High'] = vlist[7]
         # Low pre_24h_price_min 24小时内最低价
