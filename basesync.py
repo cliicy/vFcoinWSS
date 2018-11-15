@@ -83,7 +83,7 @@ class BaseSync(object):
         # quote_vol 计价货币成交量
         ybdd['quote_vol'] = round(vitem['quote_vol'], 2)
         ybdd['exchange'] = 'fcoin'
-        ybdd['info_name'] = 'kline'
+        ybdd['api'] = 'kline'
         coll = sdb[mdb[self.interval]]
         coll.insert(ybdd)
 

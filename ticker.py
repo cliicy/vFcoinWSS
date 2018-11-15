@@ -195,7 +195,7 @@ class TickerApp(BaseSync):
         # Low pre_24h_price_min 24小时内最低价
         ybdd['Low'] = vlist[8]
         ybdd['exchange'] = 'fcoin'
-        ybdd['info_name'] = 'ticker'
+        ybdd['api'] = 'ticker'
         # Volume pre_24h_usd_finish_amt 24小时内计价货币成交量
         ybdd['Volume'] = round(vlist[10], 2)
         ticker_coll.update({'sym': ybdd['sym']}, {'$set': {'Price': ybdd['Price'], 'Change': ybdd['Change'],
